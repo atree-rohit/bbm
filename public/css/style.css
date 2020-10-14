@@ -1,0 +1,1 @@
+.table thead th{white-space:nowrap;overflow:hidden}.table tbody tr:hover{background-color:#ff0!important;cursor:pointer}.table{table-layout:fixed!important;word-wrap:break-word}#atree_logo{filter:drop-shadow(0 0 2px #fff);height:60px}form label.required:after{color:red;content:" *"}
