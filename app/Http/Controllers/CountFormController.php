@@ -16,6 +16,10 @@ class CountFormController extends Controller
      */
     public function index()
     {
+        $forms = CountForm::all();
+    }
+    public function import()
+    {
         $uploaded_forms = CountForm::all()->pluck("filename")->toArray();
         // dd($uploaded_forms);
         $folder = storage_path("app/public/count_sheets");
@@ -23,7 +27,11 @@ class CountFormController extends Controller
 
         $files_array = $file_names = [];
         $start = $_GET["start"] ?? 0;
-        $count_end = $_GET["limit"]-1 ?? 0;
+        if (isset($_GET["limit"])) {
+            $count_end = $_GET["limit"]-1;
+        } else {
+            $count_end = 0;
+        }
         $count =0;
         $colors = ["gray", "steel", "secondary",  "dark"];
 

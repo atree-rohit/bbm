@@ -11,6 +11,6 @@ class FormRow extends Model
 
     public function form()
     {
-        return $this->belongsTo(CountForm::class);
+        return $this->belongsTo(CountForm::class, "count_form_id");
     }
 }

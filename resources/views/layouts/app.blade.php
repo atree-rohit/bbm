@@ -20,7 +20,7 @@
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('/css/bootstrap-colors.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('/css/style.css') }}" rel="stylesheet" type="text/css">
-    {{-- <link href="{{ asset('/c4/css/bootstrap.css') }}" rel="stylesheet" type="text/css"> --}}
+
     @yield('style')
 </head>
 <body>

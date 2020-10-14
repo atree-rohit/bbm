@@ -14,7 +14,9 @@ class FormRowController extends Controller
      */
     public function index()
     {
-        //
+        $rows = FormRow::with("form")->get();
+
+        return view('species.index', compact('rows'));
     }
 
     /**
