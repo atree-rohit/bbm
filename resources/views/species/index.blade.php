@@ -66,6 +66,7 @@
 			{"title": "Species", "data": "scientific_name"},
 			{"title": "Count", "data": "no_of_individuals"},
 			{"title": "Remarks", "data": "remarks"},
+			{"title": "File", "data": "form.filename"},
 			// {"title": "Created at", "data": "created_at"}
 			]
 		});
