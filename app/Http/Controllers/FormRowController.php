@@ -14,9 +14,13 @@ class FormRowController extends Controller
      */
     public function index()
     {
+        // $rows = FormRow::with("form")->whereNotNull("common_name" )->get();
         $rows = FormRow::with("form")->get();
+        $common_names = $rows->unique("common_name")->pluck("common_name");
+        $scientific_names = $rows->unique("species")->pluck("species");
+        
 
-        return view('species.index', compact('rows'));
+        return view('species.index', compact('rows', 'common_names', 'scientific_names'));
     }
 
     /**
@@ -69,9 +73,15 @@ class FormRowController extends Controller
      * @param  \App\Models\FormRow  $formRow
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, FormRow $formRow)
+    public function update(Request $request, $id)
     {
-        //
+        $row = FormRow::find($id);
+        $fields = ['sl_no', 'common_name', 'scientific_name', 'no_of_individuals', 'remarks'];
+        foreach($fields as $f)
+            $row->$f = $request->$f;
+        $row->save();
+
+        return redirect()->back();
     }
 
     /**

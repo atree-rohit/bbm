@@ -17,6 +17,7 @@ class CountFormController extends Controller
     public function index()
     {
         $forms = CountForm::all();
+        dd($forms);
     }
     public function import()
     {
@@ -30,7 +31,7 @@ class CountFormController extends Controller
         if (isset($_GET["limit"])) {
             $count_end = $_GET["limit"]-1;
         } else {
-            $count_end = 0;
+            $count_end = 1000;
         }
         $count =0;
         $colors = ["gray", "steel", "secondary",  "dark"];
@@ -115,7 +116,12 @@ class CountFormController extends Controller
                         $form_row = new FormRow();
                         $form_row->count_form_id = $form->id;
                         foreach ($rowFields as $k => $rf) {
-                            $form_row->{$rf[0]} = $sheet[$i][$k];
+                            if($k == 1)
+                                $form_row->{$rf[0]} = trim(ucwords(strtolower($sheet[$i][$k])));
+                            elseif($k == 2)
+                                $form_row->{$rf[0]} = trim(ucfirst(strtolower($sheet[$i][$k])));
+                            else
+                                $form_row->{$rf[0]} = trim($sheet[$i][$k]);
                         }
                         $form_row->save();
                     }
