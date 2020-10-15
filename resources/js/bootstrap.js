@@ -13,6 +13,7 @@ try {
     require('bootstrap');
     require('datatables');
     require('datatables.net-bs4');
+    require('datatables.net-buttons-bs4');
     require('datatables.net-fixedheader-bs4');
 } catch (e) {}
 

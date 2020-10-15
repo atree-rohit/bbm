@@ -24,7 +24,7 @@
     @yield('style')
 </head>
 <body>
-    <div id="app">
+    <div id="app" class="table-secondary">
         <nav class="navbar navbar-expand-md navbar-dark bg-vermillion-dark shadow-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url('/') }}">
@@ -35,60 +35,21 @@
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav mr-auto">
-
-                    </ul>
-
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
-                        @guest
-                            <li class="nav-item">
-                                {{-- <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a> --}}
-                            </li>
-                            {{-- @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
-                                </li>
-                            @endif --}}
-                        @else
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('villages.index') }}">Villages</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('respondents.index') }}">Respondents</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('food_items.index') }}">Food Items</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('wild_edibles.index') }}">Wild Edibles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('changes.index') }}">Issues/Changes</a>
-                            </li>
-                            {{-- <li class="nav-item">
-                                <a class="nav-link" href="{{ route('file.index') }}">File structure</a>
-                            </li> --}}
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }} <span class="caret"></span>
+                                    Butterfly Count <span class="caret"></span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logs.index') }}">Logs</a>
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
+                                    <a class="dropdown-item" href="{{ url('butterfly_count') }}">Index</a>
+                                    <a class="dropdown-item" href="{{ url('butterfly_count/import') }}">Import</a>
                                 </div>
                             </li>
-                        @endguest
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('species') }}">Species</a>
+                            </li>
                     </ul>
                 </div>
             </div>

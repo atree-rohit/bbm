@@ -29,6 +29,7 @@ class CreateCountFormsTable extends Migration
             $table->string('weather')->nullable();
             $table->text('comments')->nullable();
             $table->string('filename');
+            $table->boolean('duplicate')->default(false);
             $table->timestamps();
         });
     }
