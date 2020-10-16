@@ -1,10 +1,11 @@
 @extends('layouts.app')
 
 @section('style')
-	<link href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" rel="stylesheet">
+	{{-- <link href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script> --}}
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.js"></script>
 @endsection
 
 @section('content')
@@ -82,27 +83,32 @@
 				"lengthMenu": [100,250],
 				"order": [[ 0, "asc" ]],
 				"columns": [
-				{"title": "ID", "data": "id"},
-				{"title": "Name", "data": "name"},
-				{"title": "Affilation", "data": "affilation"},
-				{"title": "Phone", "data": "phone"},
-				{"title": "Email", "data": "email"},
-				{"title": "Team Members", "data": "team_members"},
-				{"title": "Link", "data": "photo_link"},
-				{"title": "Coordinates", "data": "coordinates"},
-				{"title": "Date", "data": "date"},
-				{"title": "Altitude", "data": "altitude"},
-				{"title": "Distance", "data": "distance"},
-				{"title": "Weather", "data": "weather"},
-				{"title": "Comments", "data": "comments"},
-				{"title": "filename", "data": "filename"},
-				{"title": "Species", "data": "rows_count"},
-				{"title": "Duplicate", "data": "duplicate"},
-				// {"title": "Created at", "data": "created_at"}
+					{"title": "ID", "data": "id"},
+					{"title": "Name", "data": "name"},
+					{"title": "Affilation", "data": "affilation"},
+					{"title": "Phone", "data": "phone"},
+					{"title": "Email", "data": "email"},
+					{"title": "Team Members", "data": "team_members"},
+					{"title": "Link", "data": "photo_link"},
+					{"title": "Coordinates", "data": "coordinates"},
+					{"title": "Date", "data": "date"},
+					{"title": "Altitude", "data": "altitude"},
+					{"title": "Distance", "data": "distance"},
+					{"title": "Weather", "data": "weather"},
+					{"title": "Comments", "data": "comments"},
+					{"title": "filename", "data": "filename"},
+					{"title": "Species", "data": "rows_count"},
+					{"title": "Duplicate", "data": "duplicate"},
+					// {"title": "Created at", "data": "created_at"}
 				],
-			// dom: 'Bfrtip',
-			// buttons: ['csv']
+				// "dom": 'Bfrtip',
+				// "buttons": ['csv'],
+				// "initComplete": function() {
+				// 	table.buttons().container().appendTo('#count_data_table_wrapper .col-md-6:eq(0)');
+				// 	$("#count_data_table").show();
+				// },
 			});
+			// table.buttons().container().appendTo('#count_data_table_wrapper .col-md-6:eq(0)');
 
 			$("#count_data_table tbody").on('click', "tr", function(){
 				var row_data = $("#count_data_table").DataTable().row(this).data();

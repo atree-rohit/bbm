@@ -21,6 +21,7 @@ class CreateFormRowsTable extends Migration
             $table->string('scientific_name')->nullable();
             $table->string('no_of_individuals')->nullable();
             $table->string('remarks')->nullable();
+            $table->string('id_quality')->nullable();
             $table->timestamps();
 
             $table->foreign('count_form_id')->references('id')->on('count_forms')->onUpdate("cascade");

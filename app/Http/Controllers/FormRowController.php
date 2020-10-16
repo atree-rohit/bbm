@@ -16,7 +16,7 @@ class FormRowController extends Controller
     {
         // $rows = FormRow::with("form")->whereNotNull("common_name" )->get();
         $rows = FormRow::with("form")->get();
-        echo $rows->count();
+        
         foreach ($rows as $k=>$v) {
             if ($v->form->duplicate) {
                 unset($rows[$k]);
@@ -24,11 +24,10 @@ class FormRowController extends Controller
         }
 
 
-        $common_names = $rows->unique("common_name")->pluck("common_name");
-        $scientific_names = $rows->unique("species")->pluck("species");
 
 
-        return view('species.index', compact('rows', 'common_names', 'scientific_names'));
+
+        return view('species.index', compact('rows'));
     }
 
     /**
@@ -38,9 +37,26 @@ class FormRowController extends Controller
      */
     public function create()
     {
-        //
+        $data = FormRow::select("scientific_name")->distinct("scientific_name")->orderBy("scientific_name")->where("id_quality", "=", "species")->get()->toArray();
+        
+        
+        // $data = $rows->groupBy("scientific_name")->toArray();
+        
+        return view('species.create', compact('data'));
     }
 
+    public function id_quality(Request $request){
+        // dd($request->all());
+        $names = json_decode($request->names);
+        $quality = $request->id_quality;
+
+        foreach($names as $n){
+            $rows = FormRow::where("scientific_name", "=", "$n")->update(["id_quality"=>$quality]);
+        }
+
+
+        return redirect()->back();
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -84,7 +100,7 @@ class FormRowController extends Controller
     public function update(Request $request, $id)
     {
         $row = FormRow::find($id);
-        $fields = ['sl_no', 'common_name', 'scientific_name', 'no_of_individuals', 'remarks'];
+        $fields = ['sl_no', 'common_name', 'scientific_name', 'no_of_individuals', 'remarks', 'id_quality'];
         foreach ($fields as $f) {
             $row->$f = $request->$f;
         }
@@ -106,4 +122,34 @@ class FormRowController extends Controller
 
         return redirect()->back();
     }
+
+    public function correct()
+    {
+        $col = $_GET["col"] ?? "scientific_name";
+        
+        $rows = FormRow::orderBy("$col", "asc")->where("id_quality", "<>", null)->get()->groupBy("$col");
+        $data = [];
+        foreach($rows as $k => $v){
+            $data[] = [$k, $v->count()];
+        }
+        
+        return view('species.correct', compact('data'));
+    }
+
+    public function correct_update(Request $request)
+    {
+        $count = 0;
+        if(strlen($request->corrected)){
+
+        $rows = FormRow::where($request->col, "=", $request->names)->get();
+            foreach($rows as $row){
+                $row->{$request->col} = $request->corrected;
+                $row->save();
+                $count++;
+            }
+        }
+
+        return redirect()->back()->with("success", $count);
+    }
+
 }

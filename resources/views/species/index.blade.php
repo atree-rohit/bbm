@@ -1,10 +1,6 @@
 @extends('layouts.app')
 
 @section('style')
-	<link href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" rel="stylesheet">
-    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script>
 @endsection
 
 @section('content')
@@ -46,6 +42,11 @@
 						<label for="filename">Filename</label>
 						<input type="text" class="form-control" name="filename" id="filename" value="" readonly="readonly">
 					</div>
+					<div class="form-group">
+						<label for="id_quality">ID Quality</label>
+						<input type="text" class="form-control" name="id_quality" id="id_quality" value="">
+						<small id="id_quality_help" class="form-text text-muted">species | genus | family | mismatch | flag</small>
+					</div>
 				</div>
 				<div class="modal-footer">
 					<button type="submit" class="btn btn-success" id="saveBtn">Save changes</button>
@@ -83,6 +84,7 @@
 			{"title": "Count", "data": "no_of_individuals"},
 			{"title": "Remarks", "data": "remarks"},
 			{"title": "File", "data": "form.filename"},
+			{"title": "Quality", "data": "form.id_quality"},
 			// {"title": "Created at", "data": "created_at"}
 			],
 			// dom: 'Bfrtip',
@@ -97,6 +99,7 @@
 			$("#edit_modal #no_of_individuals").val(row_data.no_of_individuals);
 			$("#edit_modal #remarks").val(row_data.remarks);
 			$("#edit_modal #filename").val(row_data.form.filename);
+			$("#edit_modal #id_quality").val(row_data.form.id_quality);
 
 			$("#rowForm").attr("action", "{{ url("/") }}" + "/species/" + row_data.id);
 			$("#edit_modal .delete").attr("action", "{{ url("/") }}" + "/species/" + row_data.id);

@@ -20,5 +20,10 @@ Route::get('/', function () {
 });
 
 Route::get('/butterfly_count/import', [CountFormController::class, 'import']);
+
+Route::post('/species/id_quality', [FormRowController::class, 'id_quality']);
+Route::get('/species/correct', [FormRowController::class, 'correct']);
+Route::post('/species/correct_update', [FormRowController::class, 'correct_update']);
+
 Route::resource('/butterfly_count', CountFormController::class);
 Route::resource('/species', FormRowController::class);
