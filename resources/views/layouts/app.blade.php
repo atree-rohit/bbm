@@ -39,16 +39,23 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <a id="CountDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Butterfly Count <span class="caret"></span>
                                 </a>
-                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="CountDropdown">
                                     <a class="dropdown-item" href="{{ url('butterfly_count') }}">Index</a>
                                     <a class="dropdown-item" href="{{ url('butterfly_count/import') }}">Import</a>
                                 </div>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url('species') }}">Species</a>
+                            <li class="nav-item dropdown">
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    Species <span class="caret"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                    <a class="dropdown-item" href="{{ url('species') }}">Index</a>
+                                    <a class="dropdown-item" href="{{ url('species/id_quality') }}">ID Quality</a>
+                                    <a class="dropdown-item" href="{{ url('species/correct') }}">Correct Columns</a>
+                                </div>
                             </li>
                     </ul>
                 </div>

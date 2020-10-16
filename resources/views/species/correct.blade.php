@@ -15,11 +15,11 @@
 		<thead>
 			<tr>
 				<th>{{ ucwords(str_replace("_", " ", $col)) }}</th>
+				<th>Common Name</th>
 				<th>Count</th>
 			</tr>
 		</thead>
 	</table>
-	<a class="btn btn-lg btn-success" id="modalBtn">Add ID Quality</a>
 </div>
 <div class="modal" tabindex="-1" role="dialog" id="edit_modal">
 	<div class="modal-dialog" role="document">
@@ -37,7 +37,7 @@
 						<label for="names">Names</label>
 						<textarea type="text" class="form-control" name="names" id="names"> </textarea>
 					</div>
-					
+
 					<div class="form-group border border-success table-success">
 						<label for="corrected">Corrected</label>
 						<input type="text" class="form-control" name="corrected" id="corrected" value="">
@@ -76,13 +76,13 @@
 		$("#species_table tbody").on('click', "tr", function(){
 			var row_data = $("#species_table").DataTable().row(this).data();
 			$("#edit_modal #names").val(row_data[0]);
-			
+
 			$("#edit_modal").modal("show");
 
 
 
 		});
-		
+
 	});
 </script>
 @endsection

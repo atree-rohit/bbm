@@ -1,33 +1,24 @@
 @extends('layouts.app')
 
-@section('style')
-@endsection
-
 @section('content')
+@php
+	$col = $_GET["col"] ?? "scientific_name";
+@endphp
 <div class="container-fluid border border-info bg-light p-5">
 	<table class="table table-hover table-dark table-sm" id="species_table">
 		<thead>
 			<tr>
-				<th>Scientific Name</th>
+				<th>{{ ucwords(str_replace("_", " ", $col)) }}</th>
+				<th>Count</th>
 			</tr>
 		</thead>
-		<tbody>
-			@foreach($data as $v)
-			
-			@if($v["scientific_name"] != "")
-			<tr>
-				<td>{{$v["scientific_name"]}}</td>
-			</tr>
-			@endif
-			@endforeach
-		</tbody>
 	</table>
 	<a class="btn btn-lg btn-success" id="modalBtn">Add ID Quality</a>
 </div>
 <div class="modal" tabindex="-1" role="dialog" id="edit_modal">
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
-			<form id="rowForm" action="{{ url("/species/id_quality") }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
+			<form id="rowForm" action="{{ url("/species/id_quality_update") }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
 				<div class="modal-body">
 					@csrf
 
@@ -35,7 +26,7 @@
 						<label for="names">Names</label>
 						<textarea type="text" class="form-control" name="names" id="names"> </textarea>
 					</div>
-					
+
 					<div class="form-group">
 						<label for="id_quality">ID Quality</label>
 						<input type="text" class="form-control" name="id_quality" id="id_quality" value="">
@@ -55,11 +46,19 @@
 @section('script')
 <script type="text/javascript">
 	$(document).ready(function () {
-	
-		$("#species_table tbody").on('click', "tr", function(){
-			
-			$(this).toggleClass("table-secondary text-success selected");
+		var data = @json($data);
 
+		var table = $("#species_table").DataTable({
+			"data": data,
+			"scrollY": true,
+			"scrollX": false,
+			"fixedHeader": true,
+			"lengthMenu": [100,250],
+			"order": [[ 0, "asc" ]],
+		});
+
+		$("#species_table tbody").on('click', "tr", function(){
+			$(this).toggleClass("table-secondary text-success selected");
 		});
 
 		$("#modalBtn").on('click', function(){

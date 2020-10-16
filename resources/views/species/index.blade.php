@@ -84,7 +84,7 @@
 			{"title": "Count", "data": "no_of_individuals"},
 			{"title": "Remarks", "data": "remarks"},
 			{"title": "File", "data": "form.filename"},
-			{"title": "Quality", "data": "form.id_quality"},
+			{"title": "Quality", "data": "id_quality"},
 			// {"title": "Created at", "data": "created_at"}
 			],
 			// dom: 'Bfrtip',
@@ -99,7 +99,7 @@
 			$("#edit_modal #no_of_individuals").val(row_data.no_of_individuals);
 			$("#edit_modal #remarks").val(row_data.remarks);
 			$("#edit_modal #filename").val(row_data.form.filename);
-			$("#edit_modal #id_quality").val(row_data.form.id_quality);
+			$("#edit_modal #id_quality").val(row_data.id_quality);
 
 			$("#rowForm").attr("action", "{{ url("/") }}" + "/species/" + row_data.id);
 			$("#edit_modal .delete").attr("action", "{{ url("/") }}" + "/species/" + row_data.id);
