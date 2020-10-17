@@ -70,8 +70,8 @@
 	$(document).ready(function () {
 		var table = $("#species_table").DataTable({
 			"data": data,
-			"scrollY": true,
-			"scrollX": false,
+			"scrollY": "400px",
+			"scrollX": true,
 			"fixedHeader": true,
 			"lengthMenu": [100,250],
 			"order": [[ 3, "asc" ]],

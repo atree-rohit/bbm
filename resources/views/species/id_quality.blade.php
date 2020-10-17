@@ -23,6 +23,11 @@
 					@csrf
 
 					<div class="form-group">
+						<label for="col">Column</label>
+						<input type="text" class="form-control" name="col" id="col" value="{{$col}}" readonly>
+					</div>
+
+					<div class="form-group">
 						<label for="names">Names</label>
 						<textarea type="text" class="form-control" name="names" id="names"> </textarea>
 					</div>
@@ -50,7 +55,7 @@
 
 		var table = $("#species_table").DataTable({
 			"data": data,
-			"scrollY": true,
+			"scrollY": "600px",
 			"scrollX": false,
 			"fixedHeader": true,
 			"lengthMenu": [100,250],

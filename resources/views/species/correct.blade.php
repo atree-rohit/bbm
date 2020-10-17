@@ -60,7 +60,7 @@
 	$(document).ready(function () {
 		var table = $("#species_table").DataTable({
 			"data": data,
-			"scrollY": true,
+			"scrollY": "600px",
 			"scrollX": false,
 			"fixedHeader": true,
 			"lengthMenu": [100,250],

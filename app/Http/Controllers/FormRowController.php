@@ -110,6 +110,8 @@ class FormRowController extends Controller
     public function id_quality()
     {
         $col = $_GET["col"] ?? "scientific_name";
+        $col_inv = ($col == "scientific_name") ? "common_name" : "scientific_name";
+
         $quality = $_GET["quality"] ?? null;
         $rows = FormRow::where("id_quality", "=", $quality)
                         ->where($col, "<>", null)
@@ -127,33 +129,54 @@ class FormRowController extends Controller
     {
         $names = json_decode($request->names);
         $quality = $request->id_quality;
+        $count = 0;
 
         foreach ($names as $n) {
-            $rows = FormRow::where("scientific_name", "=", "$n")->get();
+            $rows = FormRow::where($request->col, "=", "$n")->get();
             $myRequest = new \Illuminate\Http\Request();
             $myRequest->setMethod('POST');
             $myRequest->request->add(['id_quality' => $quality]);
             foreach ($rows as $r) {
                 $this->update($myRequest, $r->id);
+                $count++;
             }
         }
 
 
-        return redirect()->back();
+        return redirect()->back()->with("success", $count);
     }
 
     public function correct()
     {
         $col = $_GET["col"] ?? "scientific_name";
+        $col_inv = ($col == "scientific_name") ? "common_name" : "scientific_name";
+
         $quality = $_GET["quality"] ?? null;
+        // $rows = FormRow::orderBy($col, "asc")
+        //             // ->where("id_quality", "=", $quality)
+        //             ->where($col_inv, "=", null)
+        //             ->where("id_quality", "<>", "flag")
+        //             ->get()
+        //             ->groupBy($col);
         $rows = FormRow::orderBy($col, "asc")
-                    ->where("id_quality", "=", $quality)
-                    ->get()
-                    ->groupBy("$col");
+                        // ->where($col_inv, "=", null)
+                        ->where("id_quality", "=", $quality)
+                        ->get()
+                        ->groupBy($col);
+        // dd($rows);
+
         $data = [];
         foreach ($rows as $k => $v) {
-            // dd();
-            $data[] = [$k, $v->first()->common_name, $v->count()];
+            $list = [];
+            foreach($v as $w){
+                if(!in_array($w->{$col_inv}, array_keys($list))) {
+                    $list[$w->{$col_inv}] = 1;
+                } else {
+                    $list[$w->{$col_inv}]++;
+
+                }
+            }
+            $data[] = [$k, json_encode($list), $v->count()];
         }
 
         return view('species.correct', compact('data'));
@@ -169,9 +192,16 @@ class FormRowController extends Controller
             $myRequest->request->add([$request->col => $request->corrected]);
             foreach ($rows as $row) {
                 $this->update($myRequest, $row->id);
+                $count++;
             }
         }
 
         return redirect()->back()->with("success", $count);
+    }
+
+    public function common2sci(){
+        $a = FormRow::where("id_quality", "=", "species")->get()->groupBy("common_name");
+        dd($a->first()->filter());
+
     }
 }
