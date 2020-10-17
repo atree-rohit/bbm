@@ -58,6 +58,7 @@
 									<th>Scientific Name</th>
 									<th>Count</th>
 									<th>Remarks</th>
+									<th>Quality</th>
 								</tr>
 
 							</thead>
@@ -125,6 +126,7 @@
 					species_rows += "<td>"+r.scientific_name+"</td>";
 					species_rows += "<td>"+r.no_of_individuals+"</td>";
 					species_rows += "<td>"+r.remarks+"</td>";
+					species_rows += "<td>"+r.id_quality+"</td>";
 					species_rows += "</tr>";
 				});
 				$("#edit_modal #species_table").html(species_rows);

@@ -113,8 +113,9 @@ class FormRowController extends Controller
         $col_inv = ($col == "scientific_name") ? "common_name" : "scientific_name";
 
         $quality = $_GET["quality"] ?? null;
-        $rows = FormRow::where("id_quality", "=", $quality)
-                        ->where($col, "<>", null)
+        $rows = FormRow::where($col, "<>", null)
+                        // ->where("id_quality", "=", $quality)
+                        ->where("id_quality", "<>", "flag")
                         ->orderBy($col, "ASC")
                         ->get()
                         ->groupBy($col);
@@ -159,8 +160,9 @@ class FormRowController extends Controller
         //             ->get()
         //             ->groupBy($col);
         $rows = FormRow::orderBy($col, "asc")
-                        // ->where($col_inv, "=", null)
-                        ->where("id_quality", "=", $quality)
+                        ->where($col, "<>", null) 
+                        // ->where("id_quality", "=", $quality)
+                        ->where("id_quality", "<>", "flag")
                         ->get()
                         ->groupBy($col);
         // dd($rows);
@@ -195,13 +197,23 @@ class FormRowController extends Controller
                 $count++;
             }
         }
+        else
+            dd($request->all());
 
         return redirect()->back()->with("success", $count);
     }
 
     public function common2sci(){
         $a = FormRow::where("id_quality", "=", "species")->get()->groupBy("common_name");
-        dd($a->first()->filter());
+        $sci_name = "";
+        $ele_without_sci_name = [];
+        foreach($a as $b=>$c){
+            foreach($c as $d){
+                if(isset($d->scientific_name)){
+                    // if()
+                }
+            }
+        }
 
     }
 }
