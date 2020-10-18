@@ -1,10 +1,6 @@
 @extends('layouts.app')
 
 @section('style')
-	{{-- <link href="https://cdn.datatables.net/buttons/1.6.4/css/buttons.dataTables.min.css" rel="stylesheet">
-    <script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.4/js/dataTables.buttons.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/1.6.4/js/buttons.html5.min.js"></script> --}}
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.js"></script>
 @endsection
 
@@ -16,7 +12,7 @@
 	<div class="modal-dialog modal-xl" role="document">
 		<div class="modal-content">
 			<div class="row">
-				<div class="col">
+				<div class="col-12">
 					<form id="countForm" action="" method="POST" enctype="multipart/form-data" class="form-horizontal">
 						<div class="modal-body">
 							@csrf
@@ -25,7 +21,7 @@
 
 								@foreach($formFields as $f)
 								<tr>
-									<td>{{$f[1]}}</td>
+									<td class="w-25">{{$f[1]}}</td>
 									<td><input type="text" class="form-control" name="{{$f[0]}}" id="{{$f[0]}}" value=""></td>
 								</tr>
 								@endforeach
@@ -81,27 +77,41 @@
 				"scrollY": true,
 				"scrollX": false,
 				"fixedHeader": true,
-				"lengthMenu": [100,250],
-				"order": [[ 0, "asc" ]],
+				"lengthMenu": [100,250, -1],
+				"order": [[ 3, "asc" ]],
 				"columns": [
 					{"title": "ID", "data": "id"},
 					{"title": "Name", "data": "name"},
-					{"title": "Affilation", "data": "affilation"},
-					{"title": "Phone", "data": "phone"},
-					{"title": "Email", "data": "email"},
-					{"title": "Team Members", "data": "team_members"},
+					// {"title": "Affilation", "data": "affilation"},
+					// {"title": "Phone", "data": "phone"},
+					// {"title": "Email", "data": "email"},
+					// {"title": "Team Members", "data": "team_members"},
 					{"title": "Link", "data": "photo_link"},
 					{"title": "Coordinates", "data": "coordinates"},
 					{"title": "Date", "data": "date"},
 					{"title": "Altitude", "data": "altitude"},
 					{"title": "Distance", "data": "distance"},
-					{"title": "Weather", "data": "weather"},
-					{"title": "Comments", "data": "comments"},
-					{"title": "filename", "data": "filename"},
+					// {"title": "Weather", "data": "weather"},
+					// {"title": "Comments", "data": "comments"},
+					{"title": "filename", "data": "filename", "class":"text-nowrap"},
 					{"title": "Species", "data": "rows_count"},
-					{"title": "Duplicate", "data": "duplicate"},
+					// {"title": "Duplicate", "data": "duplicate"},
+					{"title": "Total Individuals", "data": "total_butterflies"},
+					{"title": "Non int", "data": "non_int"},
 					// {"title": "Created at", "data": "created_at"}
 				],
+				"fnRowCallback": function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+					if (aData["total_butterflies"] == 0) {
+						$('td', nRow).addClass('text-danger');
+					} else  {
+						$('td', nRow).addClass("text-dark");
+					}
+					if (aData["non_int"] > 0) {
+						$('td', nRow).addClass('bg-info');
+					} else  {
+						$('td', nRow).addClass("bg-success");
+					}
+				}
 				// "dom": 'Bfrtip',
 				// "buttons": ['csv'],
 				// "initComplete": function() {

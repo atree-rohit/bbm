@@ -73,8 +73,8 @@
 			"scrollY": "400px",
 			"scrollX": true,
 			"fixedHeader": true,
-			"lengthMenu": [100,250],
-			"order": [[ 3, "asc" ]],
+			"lengthMenu": [-1, 100,250],
+			"order": [[ 0, "asc" ]],
 			"columns": [
 			{"title": "ID", "data": "id"},
 			{"title": "FormData ID", "data": "form.id"},

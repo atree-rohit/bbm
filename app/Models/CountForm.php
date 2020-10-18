@@ -21,4 +21,5 @@ class CountForm extends Model
     {
         return $this->hasMany(FormRow::class);
     }
+
 }
