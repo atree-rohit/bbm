@@ -112,10 +112,10 @@ class FormRowController extends Controller
         $col = $_GET["col"] ?? "scientific_name";
         $col_inv = ($col == "scientific_name") ? "common_name" : "scientific_name";
 
-        $quality = $_GET["quality"] ?? null;
+        $quality = $_GET["quality"] ?? "flag";
         $rows = FormRow::where($col, "<>", null)
                         // ->where("id_quality", "=", $quality)
-                        ->where("id_quality", "<>", "flag")
+                        ->where("id_quality", "=", $quality)
                         ->orderBy($col, "ASC")
                         ->get()
                         ->groupBy($col);
@@ -152,7 +152,7 @@ class FormRowController extends Controller
         $col = $_GET["col"] ?? "scientific_name";
         $col_inv = ($col == "scientific_name") ? "common_name" : "scientific_name";
 
-        $quality = $_GET["quality"] ?? null;
+        $quality = $_GET["quality"] ?? "flag";
         // $rows = FormRow::orderBy($col, "asc")
         //             // ->where("id_quality", "=", $quality)
         //             ->where($col_inv, "=", null)
@@ -162,7 +162,7 @@ class FormRowController extends Controller
         $rows = FormRow::orderBy($col, "asc")
                         ->where($col, "<>", null) 
                         // ->where("id_quality", "=", $quality)
-                        ->where("id_quality", "<>", "flag")
+                        ->where("id_quality", "=", $quality)
                         ->get()
                         ->groupBy($col);
         // dd($rows);
