@@ -137,11 +137,13 @@ class CountFormController extends Controller
 
     public function index()
     {
-       
+        // $forms = CountForm::where("duplicate", "=", false)->with("rows")->withCount("rows")->get();
+        // $forms_raw = CountForm::with("rows")->withCount("rows")->get();
+
         $forms = CountForm::with("rows")
                     ->where("duplicate", "=", false)
                     // ->where("coordinates", "<>", null)
-                    // ->where("id", ">", 200)
+                    // ->where("coordinates", "like", "%'%")
                     ->withCount("rows")
                     ->get()
                     ->toArray();
@@ -167,54 +169,47 @@ class CountFormController extends Controller
 
         $row_types = ["num" => 0, "gt" => 0, "plus" => 0, "range" => 0,"non" => 0];
 
-        foreach($forms as $k => $f){
+        foreach ($forms as $k => $f) {
             $sum = 0;
             $non_int_rows = 0;
-            foreach($f["rows"] as $r){
-                if($r["id_quality"] != "flag"){
+            foreach ($f["rows"] as $r) {
+                if ($r["id_quality"] != "flag") {
                     $no = trim($r["no_of_individuals"]);
-                    if(is_numeric($no)){
+                    if (is_numeric($no)) {
                         $sum += $no;
                         $row_types["num"]++;
-                    }
-                    elseif(substr($no, 0 , 1) == ">"){
-                        if(is_numeric(trim(substr($no, 1))))
+                    } elseif (substr($no, 0, 1) == ">") {
+                        if (is_numeric(trim(substr($no, 1)))) {
                             $sum += trim(substr($no, 1));
-                        else
-                            dd(trim(substr($no, 0,-1)));
+                        } else {
+                            dd(trim(substr($no, 0, -1)));
+                        }
                         $row_types["gt"]++;
-
-                    }
-                    elseif(substr($no, -1) == "+"){
-                        if(is_numeric(trim(substr($no, 0,-1))))
-                            $sum += trim(substr($no, 0,-1));
-                        else
-                            dd(trim(substr($no, 0,-1)));
+                    } elseif (substr($no, -1) == "+") {
+                        if (is_numeric(trim(substr($no, 0, -1)))) {
+                            $sum += trim(substr($no, 0, -1));
+                        } else {
+                            dd(trim(substr($no, 0, -1)));
+                        }
                         $row_types["plus"]++;
-                    }
-                    elseif(strpos($no, "-")){
+                    } elseif (strpos($no, "-")) {
                         $range = explode("-", $no);
                         // dd($range);
-                        if((isset($range[1])) and (is_numeric(trim($range[0]))) and (is_numeric(trim($range[1])))){
+                        if ((isset($range[1])) and (is_numeric(trim($range[0]))) and (is_numeric(trim($range[1])))) {
                             $sum += trim($range[0]) + trim($range[1]);
                             $row_types["range"]++;
-                        }
-                        else{
+                        } else {
                             $non_int_rows++;
                             $row_types["non"]++;
                         }
-                    }
-                    else{
-                        if((strlen($no) > 0) or $no == ""){
+                    } else {
+                        if (strlen($no) > 0) {
                             $sum += 1;
-                            $row_types["num"]++;                            
-                        }
-                        else{
+                            $row_types["num"]++;
+                        } else {
                             $non_int_rows++;
-                            $row_types["non"]++;                            
+                            $row_types["non"]++;
                         }
-
-
                     }
                 }
             }
@@ -226,7 +221,6 @@ class CountFormController extends Controller
             
             $forms[$k]["total_butterflies"] = $sum;
             $forms[$k]["non_int"] = $non_int_rows;
-
         }
 
         print_r($row_types);
