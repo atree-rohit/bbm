@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HexMapController;
 use App\Http\Controllers\FormRowController;
 use App\Http\Controllers\CountFormController;
 
@@ -26,6 +27,8 @@ Route::post('/species/id_quality_update', [FormRowController::class, 'id_quality
 Route::get('/species/correct', [FormRowController::class, 'correct']);
 Route::get('/species/common2sci', [FormRowController::class, 'common2sci']);
 Route::post('/species/correct_update', [FormRowController::class, 'correct_update']);
+
+Route::get('/map', [HexMapController::class, 'index']);
 
 Route::resource('/butterfly_count', CountFormController::class);
 Route::resource('/species', FormRowController::class);

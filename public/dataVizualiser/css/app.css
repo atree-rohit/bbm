@@ -1,0 +1,123 @@
+.page__content {
+    background-color: grey !important;
+}
+
+.toolTip {
+    position: absolute;
+    display: none;
+    height: auto;
+    background: none repeat scroll 0 0 #ccc;
+    border: 1px solid #999;
+    padding: 4px;
+    font-size: .7em;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.state {
+    fill: none;
+    stroke: #000;
+    stroke-width: .5;
+}
+
+.circles {
+    fill: red;
+    opacity: .75;
+}
+
+.labels {
+    font-family: sans-serif;
+    font-size: 11px;
+    fill: #444444;
+}
+
+.svg-container svg {
+    border: 2px solid black;
+    background-color: white;
+}
+
+.svg-container {
+    text-align: center;
+}
+
+.mapStroke {
+    stroke: black;
+    stroke-width: .5px;
+    fill: none;
+    /*fill: rgba(0,0,0,.5);*/
+    vector-effect: non-scaling-stroke;
+}
+
+.treeNode {
+    fill: none;
+    stroke: black;
+}
+
+
+/*
+    css for time series area-chart
+*/
+
+.metric-chart path.area {
+    fill: #00AA8D;
+    /* CB default, changed in each theme */
+    opacity: 0.6;
+    clip-path: url(#clip);
+}
+
+.zoom {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+}
+
+.axis-label {
+    font-size: 1.5em;
+    fill: #8e8883;
+    font-family: sans-serif;
+}
+
+
+/* .domain, .tick line {
+    stroke: #c0c0bb;
+} */
+
+
+/* .axis--x .domain, .tick line {
+    stroke: white;
+}
+
+.axis--y .domain, .tick line {
+    stroke: #c0c0bb;
+} */
+
+.axis--x .tick line {
+    stroke: white;
+    opacity: 0.4;
+}
+
+.axis--y .tick line {
+    stroke: #565656;
+    stroke-dasharray: 2, 2;
+    stroke-opacity: 0.6;
+}
+
+.metric-chart path.line {
+    fill: none;
+    stroke: #00AA8D;
+    stroke-width: 1.5px;
+    clip-path: url(#clip);
+}
+
+#displayDates {
+    font-size: small;
+    font-family: monospace;
+}
+
+
+/* brush handles  */
+
+
+/* #time_series-container .metric-chart .handle {
+    fill: #555;
+} */

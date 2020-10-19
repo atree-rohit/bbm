@@ -1,0 +1,140 @@
+{
+    "name": "Life",
+    "children": [
+      {
+        "name": "Animalia",
+        "children": [
+          {
+            "name": "Arthropoda",
+            "children": [
+              {
+                "name": "Insecta",
+                "children": [
+                  {
+                    "name": "Lepidoptera",
+                    "children": [
+                      {
+                        "name": "Nymphalidae",
+                        "children": [
+                          {
+                            "name": "Junoniini",
+                            "children": [
+                              {
+                                "name": "Junonia",
+                                "children": [
+                                  {
+                                    "name": "Junonia orithya",
+                                    "value": 1
+                                  }
+                                ]
+                              },
+                              {
+                                "name": "Hypolimnas",
+                                "children": [
+                                  {
+                                    "name": "Hypolimnas misippus",
+                                    "value": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "name": "Melanitini",
+                            "children": [
+                              {
+                                "name": "Melanitis",
+                                "children": [
+                                  {
+                                    "name": "Melanitis leda",
+                                    "value": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Lycaenidae",
+                        "children": [
+                          {
+                            "name": "Polyommatini",
+                            "children": [
+                              {
+                                "name": "Castalius",
+                                "children": [
+                                  {
+                                    "name": "Castalius rosimon",
+                                    "value": 1
+                                  }
+                                ]
+                              },
+                              {
+                                "name": "Talicada",
+                                "children": [
+                                  {
+                                    "name": "Talicada nyseus",
+                                    "value": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Papilionidae",
+                        "children": [
+                          {
+                            "name": "Leptocircini",
+                            "children": [
+                              {
+                                "name": "Graphium",
+                                "children": [
+                                  {
+                                    "name": "Graphium doson",
+                                    "value": 1
+                                  },
+                                  {
+                                    "name": "Graphium agamemnon",
+                                    "value": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "name": "Papilionini",
+                            "children": [
+                              {
+                                "name": "Papilio",
+                                "children": [
+                                  {
+                                    "name": "Papilio polymnestor",
+                                    "value": 1
+                                  },
+                                  {
+                                    "name": "Papilio polytes",
+                                    "value": 1
+                                  },
+                                  {
+                                    "name": "Papilio demoleus",
+                                    "value": 1
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
