@@ -14,15 +14,134 @@ class CountFormController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function deg2dec()
+    {
+        // $forms = CountForm::where("coordinates", "like", "%n%")
+        //             // ->where("coordinates", "like", "%/%")
+        //             // ->where("coordinates", "like", "%and%")
+        //             // ->where("coordinates", "like", "%*%")
+        //             // ->where("coordinates", "like", "%˚%")
+        //             ->get();
+        $forms = CountForm::all();
+        // dd($forms);
+
+        echo "<table border=1>";
+        foreach($forms as $f){
+            // $x = str_replace("N", "", trim($f->coordinates));
+            // $x = str_replace("E", "", trim($x));
+            // $x = str_replace('"', "", trim($x));
+            // $y = str_replace("/", "</td><td>", $x);
+            // $z = str_replace("/", ",", $x);
+            // $z = strtolower($f->coordinates);
+            // $z1 = str_replace("e", "", $z);
+            // $x = explode(", ", $z1);
+            $x = explode(",", $f->coordinates);
+            
+
+            if(!isset($x[1]))
+                $x[1] = "";
+                // $x[1] = substr($x[1], 0, -4);
+            // dd($x);
+
+            $y = "";
+            
+
+            $y = trim($x[0]) ."</td><td>". trim($x[1]);
+            
+            
+
+            // $myRequest = new \Illuminate\Http\Request();
+            // $myRequest->setMethod('PUT');
+            // $myRequest->request->add(["coordinates" => $y]);
+            
+            // $this->update($myRequest, $f->id);
+            
+
+            echo "<tr><td>".$f->id."</td><td>".$f->coordinates . "</td><td>".$y."</td></tr>";
+
+        }
+        dd($forms->count());
+
+        /*
+        */
+        foreach($forms as $f){
+            $a = str_replace("E", "", $f->coordinates);
+            $b = str_replace("°", "⁰", $a);
+            // $c = str_replace("N", "", $b);
+            $d = str_replace("''", '"', $b);
+            $e = str_replace("ʹ", "'", $d);
+            $ee = str_replace("/,", " ", $e);
+
+            // $loc = explode("/", $c);
+            // $loc = explode("˚", $d);
+            $loc = explode("N ", $ee);
+            // dd($loc);
+            $op = [];
+            foreach($loc as $k=>$l){    
+
+                $num = trim($l);
+                // $split = explode("*", $num);
+                // $split = explode("⁰", $num);
+                // $split = explode("˚", $num);
+                $split = explode("⁰", $num);
+                foreach($split as $k1=>$s){
+                    $split1 = explode("'", trim($s));
+                    foreach($split1 as $s1){
+                        if(strpos($num,'"') or ($k1 < 1)){
+                            $split2 = explode('"', trim($s1));
+                                foreach($split2 as $s2)
+                                    if(strlen(trim($s2))>0)
+                                        $op[$k][] = trim($s2);
+                        }
+                        else
+                            if(is_numeric($s1)){
+                                $op[$k][] = trim($s1);
+                                $op[$k][] = 0;
+                            }
+                            elseif(strlen($s1) > 0)
+                                dd([$f->id, $s],[$num, $k1,$s1]);
+                    }
+                }
+
+            }
+            $points = [];
+            foreach($op as $o)
+                if(isset($o[2])){
+                    if(is_numeric($o[0]) and is_numeric($o[1]) and is_numeric($o[2]))
+                        $points[] = round($o[0] + (($o[1] * 60) + $o[2]) / 3600,6);
+                    else
+                        dd([$f->id,$loc, $op]);
+                }
+                else
+                        dd([$f->id, $op, $loc]);
+            
+            $cord = implode(", ", $points);
+
+            
+            // $myRequest = new \Illuminate\Http\Request();
+            // $myRequest->setMethod('PUT');
+            // $myRequest->request->add(["coordinates" => $cord]);
+            
+            // $this->update($myRequest, $f->id);
+            
+            // dd([$f->id, $cord]);
+
+            echo "<tr><td>" .$f->id ."</td><td>".$f->coordinates . "</td><td>";
+            // echo implode("</td><td>", $op[0]) . "</td><td>" . implode("</td><td>", $op[1]) . "</td><td>";
+            echo implode("</td><td>", $points) . "</td></tr>";
+        }
+            
+        
+        
+    }
+
     public function index()
     {
-        // $forms = CountForm::where("duplicate", "=", false)->with("rows")->withCount("rows")->get();
-        // $forms_raw = CountForm::with("rows")->withCount("rows")->get();
        
         $forms = CountForm::with("rows")
                     ->where("duplicate", "=", false)
                     // ->where("coordinates", "<>", null)
-                    ->where("coordinates", "like", "%'%")
+                    // ->where("id", ">", 200)
                     ->withCount("rows")
                     ->get()
                     ->toArray();
@@ -86,7 +205,7 @@ class CountFormController extends Controller
                         }
                     }
                     else{
-                        if(strlen($no) > 0){
+                        if((strlen($no) > 0) or $no == ""){
                             $sum += 1;
                             $row_types["num"]++;                            
                         }
@@ -99,6 +218,12 @@ class CountFormController extends Controller
                     }
                 }
             }
+            
+            $coordinates = explode(", ", $f["coordinates"]);
+            // dd($coordinates);
+            $forms[$k]["latitude"] = $coordinates[0];
+            $forms[$k]["longitude"] = $coordinates[1] ?? null;
+            
             $forms[$k]["total_butterflies"] = $sum;
             $forms[$k]["non_int"] = $non_int_rows;
 
@@ -296,7 +421,9 @@ class CountFormController extends Controller
         $form = CountForm::find($id);
         $fields = ["name", "affilation", "phone", "email", "team_members", "photo_link", "location", "coordinates", "date", "altitude", "distance", "weather", "comments", "filename"];
         foreach ($fields as $f) {
-            $form->$f = $request->$f;
+            if (isset($request->$f)) {
+                $form->$f = $request->$f;
+            }
         }
         if ($request->duplicate == "on") {
             $form->duplicate = true;
