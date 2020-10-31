@@ -8,15 +8,15 @@
 
 @section('content')
 
-    <div id="map-container" class="svg-container bg-light"></div>
+    <div id="map-container" class="svg-container bg-light border border-danger d-flex"></div>
 
 @endsection
 
 @section('script')
     <script>
-    const svgWidth = 1600;
-    const svgHeight = 1200;
-    var current_zoom = 2;
+    const svgWidth = 3000;
+    const svgHeight = 2000;
+    var current_zoom = 3;
     renderMap(current_zoom);
 
     function makeGeoJSON_reverse(array) {
@@ -62,10 +62,9 @@ function renderMap(h3_zoom) {
         .attr("height", svgHeight)
         .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
         .classed("svg-content", true);
-    var projection = d3.geoMercator().scale(1200).center([65, 28]);
+    var projection = d3.geoMercator().scale(4000).center([65, 35]);
     var path = d3.geoPath().projection(projection);
     var places = @json($forms);
-    var label_size = 7;
 
 
     // const dark = ['#B08B12', '#BA5F06', '#8C3B00', '#6D191B', '#842854', '#5F7186', '#193556', '#137B80', '#144847', '#254E00'];
@@ -79,16 +78,53 @@ function renderMap(h3_zoom) {
         .reduce((a, b) => a.concat(b));
     const color = d3.scaleLinear(lightGreenFirstPalette);
 
+    renderHex(svg, path, country, places, h3_zoom);
 
+
+    svg.append("g")
+        .classed("map-boundary", true)
+        .selectAll("path").append("g")
+        .data(country.features)
+        .enter().append("path")
+        .attr("d", path)
+        .attr("stroke", "#555")
+        .attr("stroke-width", .6)
+        .style("z-index", 10)
+        .attr("fill", "none");
+
+
+    var zoom = d3.zoom()
+        .scaleExtent([0, 40])
+        .on('zoom', function() {
+            svg.selectAll('circle')
+                .attr('transform', d3.event.transform),
+            svg.selectAll('text')
+                .attr('transform', d3.event.transform),
+            svg.selectAll('path')
+                .attr('transform', d3.event.transform);
+            k = 3+ d3.event.transform.k * 0.9
+            if(Math.abs(current_zoom - Math.floor(k)) > 0){
+                current_zoom = Math.floor(k)
+                renderHex(svg, path, country, places, current_zoom)
+            }
+            console.log(current_zoom, k, Math.floor(k));
+        });
+
+    svg.call(zoom);
+
+}
+
+function renderHex(svg, path, country, places, h3_zoom)
+{
     const hexagons = h3.polyfill(country.features[0].geometry.coordinates[0].slice(0, -1).map(d => [d[1], d[0]]), h3_zoom);
-
-    // Get the outline of a set of hexagons, as a GeoJSON-style MultiPolygon
     const coordinates = h3.h3SetToMultiPolygon(hexagons, true);
-    const mapBoundary = makeGeoJSON_reverse(coordinates[0]);
-
+    const label_size = Math.pow(Math.floor(90/(h3_zoom+1)),1.1);
+    d3.select(".hex-content").remove();
+    
+    const h3Hexes = svg.append("g").classed("hex-content", true).selectAll("path");
+    const h3_zoom_factor = 5-h3_zoom;
 
     var h3Hex = [];
-    const h3Hexes = svg.append("g").selectAll("path");
     places.forEach(p => {
         const h3Address = h3.geoToH3(p.latitude, p.longitude, h3_zoom);
         var matchFlag = false;
@@ -112,84 +148,52 @@ function renderMap(h3_zoom) {
             h3Hex[matchID].total += p.total;
         }
     });
-    console.log(h3Hex);
 
     h3Hex.forEach(h => {
-        const x = h3Hexes.data(h.coordinates.features);
-        x.enter().append("path")
+        const x = h3Hexes.data(h.coordinates.features)
+        const y = x.enter().append("g")
+        const digits = h.counts.toString().length
+        const text_x_offset = Math.pow(digits+4*h3_zoom,2);
+        // console.log(h3_zoom_factor, digits, text_x_offset);
+
+        y.append("path")
             .attr("d", path)
-            // .attr("stroke", "red")
-            // .attr("stroke-width", 1)
+            .attr("stroke-width", "2.5")
+            .attr("stroke", "#900")
             .attr("opacity", ".25")
-            .attr("fill", "red");
+            .attr("fill", "#faa");
 
-            x.enter().append("text")
-                .attr("x", function(h) { return path.centroid(h)[0] - 8; })
-                .attr("y", function(h) { return path.centroid(h)[1] - 6; })
-                .attr("alignment-baseline", "central")
-                .style("font-size", label_size)
-                .style("fill", "#000000")
-                .text(h.counts);
+        y.append("text")
+            .attr("x", function(h) { return path.centroid(h)[0]; })
+            .attr("y", function(h) { return path.centroid(h)[1]; })
+            .attr("dx", -1*((50*digits)/(h3_zoom+1)))
+            // .attr("dy", -1*(25/(h3_zoom+1)))
+            .attr("alignment-baseline", "central")
+            .style("font-size", label_size-6)
+            .style("fill", "#900")
+            .text(h.total);
 
-            x.enter().append("text")
-                .attr("x", function(h) { return path.centroid(h)[0] + 3; })
-                .attr("y", function(h) { return path.centroid(h)[1] - 6; })
-                .attr("alignment-baseline", "central")
-                .style("font-size", label_size)
-                .style("fill", "#ff0000")
-                .text(h.species_count);
+        // y.append("text")
+        //     .attr("x", function(h) { return path.centroid(h)[0]; })
+        //     .attr("y", function(h) { return path.centroid(h)[1]; })
+        //     .attr("dx", -2*(50/(h3_zoom+1)))
+        //     .attr("dy", 2.5*(25/(h3_zoom+1)))
+        //     .attr("alignment-baseline", "central")
+        //     .style("font-size", label_size-4)
+        //     .style("fill", "#ff0000")
+        //     .text(h.species_count);
 
-            x.enter().append("text")
-                .attr("x", function(h) { return path.centroid(h)[0] - 5; })
-                .attr("y", function(h) { return path.centroid(h)[1] + 8; })
-                .attr("alignment-baseline", "central")
-                .style("font-size", label_size)
-                .style("fill", "#009900")
-                .text(h.total);
+        // y.append("text")
+        //     .attr("x", function(h) { return path.centroid(h)[0]; })
+        //     .attr("y", function(h) { return path.centroid(h)[1]; })
+        //     .attr("dx", -1*Math.pow(digits+3,1.5) )
+        //     .attr("alignment-baseline", "central")
+        //     .style("font-size", 13)
+        //     .style("fill", "#000000")
+        //     .text(h.total);
 
-            // x.enter().append("text")
-            //     .attr("x", function(h) { return path.centroid(h)[0] - 15; })
-            //     .attr("y", function(h) { return path.centroid(h)[1] + 18; })
-            //     .attr("alignment-baseline", "central")
-            //     .style("font-size", label_size)
-            //     .style("fill", "#009900")
-            //     .text(h.names);    
-            ;
-            // .on("click", console.log(h.value_name));
-            // (d) => { ons.notification.toast(`${h.value_counts} | ${h.value_species} | ${h.value_total} `, { timeout: 2000, animation: 'lift' }) }
 
-            // x
     });
-
-    svg.append("g").selectAll("path").append("g")
-        .data(country.features)
-        .enter().append("path")
-        .attr("d", path)
-        .attr("stroke", "#999999")
-        .attr("stroke-width", .5)
-        .style("z-index", 10)
-        .attr("fill", "none");
-
-
-    var zoom = d3.zoom()
-        .scaleExtent([1, 30])
-        .on('zoom', function() {
-            svg.selectAll('circle')
-                .attr('transform', d3.event.transform),
-            svg.selectAll('text')
-                .attr('transform', d3.event.transform),
-            svg.selectAll('path')
-                .attr('transform', d3.event.transform);
-            k = d3.event.transform.k;
-            if(Math.abs(current_zoom - Math.floor(k+1)) > 1){
-                current_zoom = Math.floor(k+2)
-                renderMap(current_zoom);
-            }
-            console.log(current_zoom, Math.floor(k+1));
-        });
-
-    svg.call(zoom);
-
 }
 
 

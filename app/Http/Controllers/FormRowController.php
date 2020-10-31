@@ -15,7 +15,7 @@ class FormRowController extends Controller
     public function index()
     {
         // $rows = FormRow::with("form")->whereNotNull("common_name" )->get();
-        $rows = FormRow::with("form")->get();
+        $rows = FormRow::all();
 
         foreach ($rows as $k=>$v) {
             if ($v->form->duplicate) {
@@ -162,7 +162,6 @@ class FormRowController extends Controller
         $rows = FormRow::orderBy($col, "asc")
                         ->where($col, "<>", null) 
                         // ->where("id_quality", "=", $quality)
-                        ->where("id_quality", "=", $quality)
                         ->get()
                         ->groupBy($col);
         // dd($rows);

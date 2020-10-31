@@ -57,6 +57,9 @@
                                     <a class="dropdown-item" href="{{ url('species/correct') }}">Correct Columns</a>
                                 </div>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('/species_names') }}">Species Names</a>
+                            </li>
                     </ul>
                 </div>
             </div>
