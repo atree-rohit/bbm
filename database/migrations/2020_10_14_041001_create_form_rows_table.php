@@ -20,6 +20,7 @@ class CreateFormRowsTable extends Migration
             $table->string('common_name')->nullable();
             $table->string('scientific_name')->nullable();
             $table->string('no_of_individuals')->nullable();
+            $table->integer('no_of_individuals_cleaned')->default(0);
             $table->string('remarks')->nullable();
             $table->string('id_quality')->nullable();
             $table->timestamps();

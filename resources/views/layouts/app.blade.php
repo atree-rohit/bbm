@@ -39,6 +39,18 @@
                     <ul class="navbar-nav ml-auto">
                         <!-- Authentication Links -->
                             <li class="nav-item dropdown">
+                                <a id="analysisDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Analysis <span class="caret"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="analysisDropdown">
+                                    <a class="dropdown-item" href="{{ url('map') }}">Map</a>
+                                    <a class="dropdown-item" href="{{ url('analysis') }}">Analysis</a>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url('/map') }}">Map</a>
+                            </li>
+                            <li class="nav-item dropdown">
                                 <a id="CountDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     Butterfly Count <span class="caret"></span>
                                 </a>

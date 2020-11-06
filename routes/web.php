@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HexMapController;
 use App\Http\Controllers\FormRowController;
 use App\Http\Controllers\SpeciesController;
+use App\Http\Controllers\AnalysisController;
 use App\Http\Controllers\CountFormController;
 
 /*
@@ -31,6 +32,7 @@ Route::get('/species/correct', [FormRowController::class, 'correct']);
 Route::get('/species/common2sci', [FormRowController::class, 'common2sci']);
 Route::post('/species/correct_update', [FormRowController::class, 'correct_update']);
 
+Route::resource('/analysis', AnalysisController::class);
 Route::get('/map', [HexMapController::class, 'index']);
 
 Route::resource('/butterfly_count', CountFormController::class);

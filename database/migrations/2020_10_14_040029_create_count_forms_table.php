@@ -24,6 +24,7 @@ class CreateCountFormsTable extends Migration
             $table->string('location')->nullable();
             $table->string('coordinates')->nullable();
             $table->string('date')->nullable();
+            $table->date('date_cleaned')->nullable();
             $table->string('altitude')->nullable();
             $table->string('distance')->nullable();
             $table->string('weather')->nullable();
