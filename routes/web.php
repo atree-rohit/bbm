@@ -32,6 +32,7 @@ Route::get('/species/correct', [FormRowController::class, 'correct']);
 Route::get('/species/common2sci', [FormRowController::class, 'common2sci']);
 Route::post('/species/correct_update', [FormRowController::class, 'correct_update']);
 
+Route::get('/analysis/summary', [AnalysisController::class, 'summary']);
 Route::resource('/analysis', AnalysisController::class);
 Route::get('/map', [HexMapController::class, 'index']);
 

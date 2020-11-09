@@ -28,6 +28,43 @@ class AnalysisController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function summary()
+    {
+
+        $rows = FormRow::whereHas('form', function($q)
+                {
+                    $q->where('duplicate', '=', false);
+
+                })
+                ->where("id_quality", "species")
+                ->get();
+        $data = [];
+        foreach($rows->groupBy("scientific_name") as $species){
+            $no_of_individuals = 0;
+            foreach($species as $s){
+                $no_of_individuals+= $s->no_of_individuals_cleaned;
+            }
+            $data[] = [
+                "scientific_name" => $species->first()->scientific_name,
+                "common_name" => $species->first()->common_name,
+                "no_of_lists" => count($species),
+                "no_of_individuals" => $no_of_individuals
+            ];
+        }
+        array_multisort( array_column($data, "no_of_lists"), SORT_DESC, $data );
+        $main_species["lists"] = array_slice($data, 0, 25);
+        array_multisort( array_column($data, "no_of_individuals"), SORT_DESC, $data );
+        $main_species["individuals"] = array_slice($data, 0, 25);
+        
+        // dd();
+
+        $summary["total_species"] = count($rows->groupBy("scientific_name"));
+        $summary["total_individuals"] = $rows->sum("no_of_individuals_cleaned");
+
+        return view("analysis.summary", compact("rows", "summary", "data", "main_species"));
+
+    }
+
     public function create()
     {
         $count = 0;
