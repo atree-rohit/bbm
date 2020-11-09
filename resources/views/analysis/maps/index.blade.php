@@ -16,7 +16,7 @@
     <script>
     const svgWidth = 3000;
     const svgHeight = 2000;
-    var current_zoom = 3;
+    var current_zoom = 4;
     renderMap(current_zoom);
 
     function makeGeoJSON_reverse(array) {
@@ -62,14 +62,10 @@ function renderMap(h3_zoom) {
         .attr("height", svgHeight)
         .attr("viewBox", "0 0 " + svgWidth + " " + svgHeight)
         .classed("svg-content", true);
-    var projection = d3.geoMercator().scale(4000).center([65, 35]);
+    var projection = d3.geoMercator().scale(2500).center([59, 39]);
     var path = d3.geoPath().projection(projection);
     var places = @json($forms);
 
-
-    // const dark = ['#B08B12', '#BA5F06', '#8C3B00', '#6D191B', '#842854', '#5F7186', '#193556', '#137B80', '#144847', '#254E00'];
-    // const mid = ['#E3BA22', '#E58429', '#BD2D28', '#D15A86', '#8E6C8A', '#6B99A1', '#42A5B3', '#0F8C79', '#6BBBA1', '#5C8100'];
-    // const light = ['#F2DA57', '#F6B656', '#E25A42', '#DCBDCF', '#B396AD', '#B0CBDB', '#33B6D0', '#7ABFCC', '#C8D7A1', '#A0B700'];
     const light = ["#2979ff", "#2979ff"];
 
     const palettes = [light];
@@ -78,7 +74,6 @@ function renderMap(h3_zoom) {
         .reduce((a, b) => a.concat(b));
     const color = d3.scaleLinear(lightGreenFirstPalette);
 
-    renderHex(svg, path, country, places, h3_zoom);
 
 
     svg.append("g")
@@ -87,11 +82,12 @@ function renderMap(h3_zoom) {
         .data(country.features)
         .enter().append("path")
         .attr("d", path)
-        .attr("stroke", "#555")
+        .attr("stroke", "#111")
         .attr("stroke-width", .6)
         .style("z-index", 10)
         .attr("fill", "none");
 
+    renderHex(svg, path, country, places, h3_zoom);
 
     var zoom = d3.zoom()
         .scaleExtent([0, 40])
@@ -104,7 +100,7 @@ function renderMap(h3_zoom) {
                 .attr('transform', d3.event.transform);
             k = 3+ d3.event.transform.k * 0.9
             if(Math.abs(current_zoom - Math.floor(k)) > 0){
-                current_zoom = Math.floor(k)
+                current_zoom = Math.floor(k) + 1
                 renderHex(svg, path, country, places, current_zoom)
             }
             console.log(current_zoom, k, Math.floor(k));
@@ -118,9 +114,9 @@ function renderHex(svg, path, country, places, h3_zoom)
 {
     const hexagons = h3.polyfill(country.features[0].geometry.coordinates[0].slice(0, -1).map(d => [d[1], d[0]]), h3_zoom);
     const coordinates = h3.h3SetToMultiPolygon(hexagons, true);
-    const label_size = Math.pow(Math.floor(90/(h3_zoom+1)),1.1);
+    const label_size = Math.pow(Math.floor(90/(h3_zoom+1)),.9);
     d3.select(".hex-content").remove();
-    
+
     const h3Hexes = svg.append("g").classed("hex-content", true).selectAll("path");
     const h3_zoom_factor = 5-h3_zoom;
 
@@ -142,7 +138,7 @@ function renderHex(svg, path, country, places, h3_zoom)
             // h3Hex.push({ "hexID": h3Address, "value": p.latitude +','+ p.longitude, "coordinates": h3Geo });
         }
         else {
-            h3Hex[matchID].counts++;
+            h3Hex[matchID].counts += 1;
             h3Hex[matchID].names += ", " + p.name;
             h3Hex[matchID].species_count += p.species;
             h3Hex[matchID].total += p.total;
@@ -153,25 +149,26 @@ function renderHex(svg, path, country, places, h3_zoom)
         const x = h3Hexes.data(h.coordinates.features)
         const y = x.enter().append("g")
         const digits = h.counts.toString().length
-        const text_x_offset = Math.pow(digits+4*h3_zoom,2);
+        const text_x_offset = Math.pow(digits+500*h3_zoom,3);
         // console.log(h3_zoom_factor, digits, text_x_offset);
 
         y.append("path")
             .attr("d", path)
             .attr("stroke-width", "2.5")
-            .attr("stroke", "#900")
-            .attr("opacity", ".25")
-            .attr("fill", "#faa");
+            .attr("stroke", "#f55")
+            .attr("opacity", ".70")
+            .attr("fill", "#fcc");
 
         y.append("text")
             .attr("x", function(h) { return path.centroid(h)[0]; })
             .attr("y", function(h) { return path.centroid(h)[1]; })
-            .attr("dx", -1*((50*digits)/(h3_zoom+1)))
+            .attr("dx", -1*((20*digits)/(h3_zoom+1)))
             // .attr("dy", -1*(25/(h3_zoom+1)))
             .attr("alignment-baseline", "central")
-            .style("font-size", label_size-6)
-            .style("fill", "#900")
-            .text(h.total);
+            .style("font-size", label_size+1)
+            .style("font-weight", "bold")
+            .style("fill", "#000")
+            .text(h.counts);
 
         // y.append("text")
         //     .attr("x", function(h) { return path.centroid(h)[0]; })

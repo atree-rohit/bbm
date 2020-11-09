@@ -21,23 +21,27 @@
 	    $('#analysisTable').DataTable();
 	} );
 
-	const chartData = @json($main_species);
 	var ctx = document.getElementById('myChart');
 	var myChart = new Chart(ctx, {
     type: 'horizontalBar',
     data: {
-        labels: @json(array_column($main_species["individuals"], "scientific_name")),
+        labels: @json(array_column($people, "name")),
         plugins: [ChartDataLabels],
         backgroundColor: "#fff",
         datasets: [{
             label: 'Lists',
-            data: @json(array_column($main_species["individuals"], "no_of_lists")),
+            data: @json(array_column($people, "lists")),
             backgroundColor: "#faa",
 
         }, {
-            label: 'Individuals',
-            data: @json(array_column($main_species["individuals"], "no_of_individuals")),
+            label: 'Species',
+            data: @json(array_column($people, "species")),
             backgroundColor: "#aaf",
+            borderWidth: 1
+        }, {
+            label: 'Individuals',
+            data: @json(array_column($people, "individuals")),
+            backgroundColor: "#afa",
             borderWidth: 1
         }]
     },

@@ -9,15 +9,15 @@ class HexMapController extends Controller
 {
     public function index()
     {
-        $forms_raw = CountForm::with("rows")->where("coordinates", "<>", null)->get();
+        $forms_raw = CountForm::with("rows")->where("coordinates", "<>", null)->where("duplicate", "false")->get();
         $forms = [];
-        // dd($forms_raw->first()->toArray());
+        // dd($forms_raw->toArray());
         foreach ($forms_raw as $f) {
             $coord = explode(", ", $f["coordinates"]);
             $count = count($f["rows"]);
             $total  = 0;
             foreach ($f["rows"] as $fr) {
-                $num =(int) $fr["no_of_individuals"];
+                $num =(int) $fr["no_of_individuals_cleaned"];
                 if (is_numeric($num)) {
                     $total += $num;
                 } else {
@@ -34,6 +34,7 @@ class HexMapController extends Controller
                 "total" => $total
             ];
         }
+        // dd($forms);
 
         return view("analysis.maps.index", compact("forms"));
     }
