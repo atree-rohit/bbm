@@ -24,7 +24,23 @@ class IBPController extends Controller
      */
     public function create()
     {
-        //
+        $fields = ["id", "createdBy", "placeName", "flagNotes", "noOfIdentifications", "createdOn", "associatedMedia", "locationLat", "locationLon", "locationScale", "fromDate", "toDate", "rank", "scientificName", "commonName", "family", "genus", "species", "state"];
+        $count = 0;
+
+        $csv_file = public_path("/Data/ibp_semi_cleaned.csv");
+        $arrayFromCSV =  array_map('str_getcsv', file($csv_file));
+        unset($arrayFromCSV[0]);
+        foreach ($arrayFromCSV as $row) {
+            $ibp = new IBP();
+            foreach ($fields as $k=>$f) {
+                $ibp->$f = $row[$k];
+            }
+            $ibp->save();
+            $count++;
+        }
+
+
+        dd("Import from CSV :" . $count);
     }
 
     /**
