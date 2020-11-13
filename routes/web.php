@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\IBPController;
 use App\Http\Controllers\HexMapController;
 use App\Http\Controllers\FormRowController;
 use App\Http\Controllers\SpeciesController;
@@ -41,3 +42,4 @@ Route::get('/map', [HexMapController::class, 'index']);
 Route::resource('/butterfly_count', CountFormController::class);
 Route::resource('/species', FormRowController::class);
 Route::resource('/species_names', SpeciesController::class);
+Route::resource('/ibp', IBPController::class);
