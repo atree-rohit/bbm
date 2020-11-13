@@ -20,8 +20,8 @@ class CreateINatsTable extends Migration
             $table->string('time_observed_at')->nullable();
             $table->bigInteger('user_id')->nullable();
             $table->string('user_login')->nullable();
-            $table->string('created_at')->nullable();
-            $table->string('updated_at')->nullable();
+            $table->string('inat_created_at')->nullable();
+            $table->string('inat_updated_at')->nullable();
             $table->string('quality_grade')->nullable();
             $table->string('license')->nullable();
             $table->text('image_url')->nullable();
