@@ -26,7 +26,6 @@ class CreateINatsTable extends Migration
             $table->string('license')->nullable();
             $table->text('image_url')->nullable();
             $table->text('tag_list')->nullable();
-            $table->text('description')->nullable();
             $table->integer('num_identification_agreements')->nullable();
             $table->integer('num_identification_disagreements')->nullable();
             $table->text('place_guess')->nullable();
