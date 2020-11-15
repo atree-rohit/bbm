@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\IBP;
+use App\Models\iNat;
 use App\Models\CountForm;
 use Illuminate\Http\Request;
 
@@ -35,6 +37,42 @@ class HexMapController extends Controller
             ];
         }
         // dd($forms);
+
+        return view("analysis.maps.index", compact("forms"));
+    }
+
+    public function inat(){
+        $inats = iNat::where("inat_created_at", "like", "%2020-09%")->get();
+        $forms = [];
+
+        foreach($inats as $i)
+            $forms[] =[
+                "id" => $i->id,
+                "name" => $i->user_login,
+                "latitude" => $i->latitude,
+                "longitude" => $i->longitude,
+                "species" => 1,
+                "total" => 1,
+
+            ];
+
+        return view("analysis.maps.index", compact("forms"));
+    }
+
+    public function ibp(){
+        $ibps = IBP::where("createdOn", "like", "%/09/2020%")->get();
+        $forms = [];
+
+        foreach($ibps as $i)
+            $forms[] =[
+                "id" => $i->id,
+                "name" => $i->createdBy,
+                "latitude" => $i->locationLat,
+                "longitude" => $i->locationLon,
+                "species" => 1,
+                "total" => 1,
+
+            ];
 
         return view("analysis.maps.index", compact("forms"));
     }
