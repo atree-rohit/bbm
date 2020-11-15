@@ -39,6 +39,8 @@ Route::get('/analysis/summary_people', [AnalysisController::class, 'summary_peop
 Route::get('/analysis/families', [AnalysisController::class, 'families']);
 Route::resource('/analysis', AnalysisController::class);
 Route::get('/map', [HexMapController::class, 'index']);
+Route::get('/map/inat', [HexMapController::class, 'inat']);
+Route::get('/map/ibp', [HexMapController::class, 'ibp']);
 
 Route::resource('/butterfly_count', CountFormController::class);
 Route::resource('/species', FormRowController::class);
