@@ -24,6 +24,46 @@ class INatController extends Controller
      */
     public function create()
     {
+
+        $inats = iNat::where("inat_created_at", "like", "%2020-09%")->get();
+
+        $fields = ["id", "user_id", "inat_created_at", "latitude", "longitude", "scientific_name", "common_name", "taxon_species_name"];
+
+        // echo "<table border=1>";
+
+        // foreach($inats as $i){
+        //     echo "<tr>";
+        //     foreach($fields as $f)
+        //         echo "<td>". $i->$f . "</td>";
+
+        //     echo "</tr>";
+        // }
+
+        // echo "<table>";
+
+        $species = [];
+        $higher_taxa = [];
+        foreach($inats as $i)
+            if($i->taxon_species_name){
+                if(isset($species[$i->common_name]))
+                    $species[$i->common_name]++;
+                else
+                    $species[$i->common_name] = 1;                
+            }
+            else{
+                if(isset($higher_taxa[$i->scientific_name]))
+                    $higher_taxa[$i->scientific_name]++;
+                else
+                    $higher_taxa[$i->scientific_name] = 1;
+            }
+
+        dd($species, $higher_taxa);
+        
+
+    }
+
+    public function import_from_csv()
+    {
         $fields = ["id", "observed_on_string", "observed_on", "time_observed_at", "user_id", "user_login", "inat_created_at", "inat_updated_at", "quality_grade", "license", "image_url", "tag_list", "num_identification_agreements", "num_identification_disagreements", "place_guess", "latitude", "longitude", "coordinates_obscured", "species_guess", "scientific_name", "common_name", "taxon_id", "taxon_family_name", "taxon_subfamily_name", "taxon_tribe_name", "taxon_subtribe_name", "taxon_genus_name", "taxon_species_name"];
         $count = 0;
 

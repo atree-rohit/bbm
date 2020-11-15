@@ -24,6 +24,25 @@ class IBPController extends Controller
      */
     public function create()
     {
+        $ibps = IBP::where("createdOn", "like", "%/09/2020%")->get();
+        $fields = ["id", "createdBy", "createdOn",  "locationLat", "locationLon", "fromDate", "toDate", "rank", "scientificName", "commonName"];
+
+        echo "<h1>".count($ibps)."</h1>";
+        echo "<table border=1>";
+
+        foreach($ibps as $i){
+            echo "<tr>";
+            foreach($fields as $f)
+                echo "<td>". $i->$f . "</td>";
+
+            echo "</tr>";
+        }
+
+        echo "<table>";
+
+    }
+    public function import_from_csv()
+    {
         $fields = ["id", "createdBy", "placeName", "flagNotes", "noOfIdentifications", "createdOn", "associatedMedia", "locationLat", "locationLon", "locationScale", "fromDate", "toDate", "rank", "scientificName", "commonName", "family", "genus", "species", "state"];
         $count = 0;
 
