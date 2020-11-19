@@ -7,29 +7,17 @@
 @endsection
 
 @section('content')
-    <div id="map-controls" class="text-center bg-dark border border-primary py-2">
-        <div class="btn-group text-justify">
-            <button id="data_counts" class="btn btn-sm btn-outline-info">Butterfly Counts</button>
-            <button id="data_inat" class="btn btn-sm btn-outline-success">iNaturalist</button>
-            <button id="data_ibp" class="btn btn-sm btn-outline-warning">India Biodiversity Portal</button>
-            <button id="data_all" class="btn btn-sm btn-outline-danger">All</button>
-        </div>
+    <div class="bg-dark border border-danger p-3 d-flex">
+        <div id="map-container" class="svg-container bg-light m-auto"></div>
     </div>
-    <div class="table-secondary m-1 p-2 row">
-        <div id="map-container" class="svg-container bg-light m-auto col"></div>
-        <div id="map-data" class="col table-info">
-            <h1>Map Data</h1>
-        </div>
-    </div>
+
 @endsection
 
 @section('script')
     <script>
     const svgWidth = 800;
     const svgHeight = 850;
-    const count_forms = @json($forms);
     var current_zoom = 4;
-
     renderMap(current_zoom);
 
     function makeGeoJSON_reverse(array) {
@@ -76,7 +64,7 @@ function renderMap(h3_zoom) {
         .classed("svg-content", true);
     var projection = d3.geoMercator().scale(1400).center([85.5, 29.5]);
     var path = d3.geoPath().projection(projection);
-    var places = count_forms;
+    var places = @json($forms);
 
     const light = ["#2979ff", "#2979ff"];
 
@@ -128,6 +116,7 @@ function renderHex(svg, path, country, places, h3_zoom)
         4: "#77DD66"
     };
 
+    console.log(hexColor);
     d3.select(".hex-content").remove();
 
     const h3Hexes = svg.append("g").classed("hex-content", true).selectAll("path");
@@ -139,6 +128,7 @@ function renderHex(svg, path, country, places, h3_zoom)
         var matchFlag = false;
         h3Hex.forEach((h,i) => {
             if (h.hexID == h3Address) {
+                h.value += p.pointCount;
                 matchFlag = true;
                 matchID = i;
             }
@@ -146,16 +136,15 @@ function renderHex(svg, path, country, places, h3_zoom)
         if (matchFlag == false) {
             const h3Boundary = h3.h3ToGeoBoundary(h3Address, true);
             const h3Geo = hexFeatures(h3Boundary);
-            h3Hex.push({ "hexID": h3Address, "counts":1 ,"names":p.name, "species_count": p.species, "total": parseInt(p.total), "coordinates": h3Geo });
+            h3Hex.push({ "hexID": h3Address, "counts":1 ,"names":p.name, "species_count": p.species, "total": p.total, "coordinates": h3Geo });
             // h3Hex.push({ "hexID": h3Address, "value": p.latitude +','+ p.longitude, "coordinates": h3Geo });
         }
         else {
             h3Hex[matchID].counts += 1;
             h3Hex[matchID].names += ", " + p.name;
             h3Hex[matchID].species_count += p.species;
-            h3Hex[matchID].total += parseInt(p.total);
+            h3Hex[matchID].total += p.total;
         }
-        console.log(h3Hex);
     });
     const display_field = "species_count";
     // const display_field = "counts";

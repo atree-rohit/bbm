@@ -4,12 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\IBP;
 use App\Models\iNat;
+use App\Models\FormRow;
 use App\Models\CountForm;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HexMapController extends Controller
 {
     public function index()
+    {
+        $forms = CountForm::where("coordinates", "<>", null)
+            ->where("duplicate", "false")
+            ->with("rows")
+            ->withCount(
+                ['rows as total' => function ($query) {
+                    $query->select(DB::raw('SUM(no_of_individuals_cleaned)'));
+                }]
+            )
+            ->withCount("rows as species")
+            ->limit(5)
+            ->get();
+        $inats = iNat::where("inat_created_at", "like", "%2020-09%")->get();
+        $ibps = IBP::where("createdOn", "like", "%/09/2020%")->get();
+
+        return view("analysis.maps.index", compact("forms"));
+    }
+    public function index_old()
     {
         $forms_raw = CountForm::with("rows")->where("coordinates", "<>", null)->where("duplicate", "false")->get();
         $forms = [];
@@ -36,16 +56,16 @@ class HexMapController extends Controller
                 "total" => $total
             ];
         }
-        // dd($forms);
 
         return view("analysis.maps.index", compact("forms"));
     }
 
-    public function inat(){
+    public function inat()
+    {
         $inats = iNat::where("inat_created_at", "like", "%2020-09%")->get();
         $forms = [];
 
-        foreach($inats as $i)
+        foreach ($inats as $i) {
             $forms[] =[
                 "id" => $i->id,
                 "name" => $i->user_login,
@@ -55,15 +75,17 @@ class HexMapController extends Controller
                 "total" => 1,
 
             ];
+        }
 
         return view("analysis.maps.index", compact("forms"));
     }
 
-    public function ibp(){
+    public function ibp()
+    {
         $ibps = IBP::where("createdOn", "like", "%/09/2020%")->get();
         $forms = [];
 
-        foreach($ibps as $i)
+        foreach ($ibps as $i) {
             $forms[] =[
                 "id" => $i->id,
                 "name" => $i->createdBy,
@@ -73,6 +95,7 @@ class HexMapController extends Controller
                 "total" => 1,
 
             ];
+        }
 
         return view("analysis.maps.index", compact("forms"));
     }
