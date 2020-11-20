@@ -1,36 +1,53 @@
-@extends('layouts.app')
-
-@section('style')
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <script src="{{ asset('js/d3.min.js') }}"></script>
     <script src="{{ asset('js/h3-js.js') }}"></script>
     <script src="{{ asset('js/country.js') }}"></script>
-@endsection
-
-@section('content')
-    <div id="map-controls" class="text-center bg-dark border border-primary py-2">
-        <div class="btn-group text-justify">
-            <button id="data_counts" class="btn btn-sm btn-outline-info">Butterfly Counts</button>
-            <button id="data_inat" class="btn btn-sm btn-outline-success">iNaturalist</button>
-            <button id="data_ibp" class="btn btn-sm btn-outline-warning">India Biodiversity Portal</button>
-            <button id="data_all" class="btn btn-sm btn-outline-danger">All</button>
-        </div>
-    </div>
+    <style>
+        .hexagon{
+            stroke-width:.3;
+            stroke: #5a5;
+            opacity:.7;
+        }
+        .hexagon:hover{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
     <div class="table-secondary m-1 p-2 row">
-        <div id="map-container" class="svg-container bg-light m-auto col"></div>
-        <div id="map-data" class="col table-info">
-            <h1>Map Data</h1>
+        <div id="map-container" class="svg-container bg-light col"></div>
+        <div class="col table-info" style="max-height: 850px;overflow-y: scroll;">
+            <h1 class="w-100">Map Data</h1>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Common Name</th>
+                        <th>Scientific Name</th>
+                        <th>Family</th>
+                        <th>Individuals</th>
+                        <th>Source</th>
+                    </tr>
+                </thead>
+                <tbody id="map-data"></tbody>
+            </table>
         </div>
     </div>
-@endsection
-
-@section('script')
-    <script>
+<script>
     const svgWidth = 800;
     const svgHeight = 850;
-    const count_forms = @json($forms);
-    var current_zoom = 4;
+    const zoom = 4;
+    const data = {
+     "butterfly_counts": @json($forms),
+     "inat": @json($inats),
+     "ibp": @json($ibps)
+    }
+    var h3Hex = [];
 
-    renderMap(current_zoom);
+    renderMap();
 
     function makeGeoJSON_reverse(array) {
     array[0].reverse();
@@ -63,7 +80,7 @@ function hexFeatures(array) {
 
 }
 
-function renderMap(h3_zoom) {
+function renderMap() {
     //clear svg before loading
     if (!d3.select("#map-container svg").empty()) {
         d3.selectAll("svg").remove();
@@ -76,17 +93,6 @@ function renderMap(h3_zoom) {
         .classed("svg-content", true);
     var projection = d3.geoMercator().scale(1400).center([85.5, 29.5]);
     var path = d3.geoPath().projection(projection);
-    var places = count_forms;
-
-    const light = ["#2979ff", "#2979ff"];
-
-    const palettes = [light];
-    const lightGreenFirstPalette = palettes
-        .map(d => d.reverse())
-        .reduce((a, b) => a.concat(b));
-    const color = d3.scaleLinear(lightGreenFirstPalette);
-
-
 
     svg.append("g")
         .classed("map-boundary", true)
@@ -95,11 +101,11 @@ function renderMap(h3_zoom) {
         .enter().append("path")
         .attr("d", path)
         .attr("stroke", "#999")
-        .attr("stroke-width", .3)
+        .attr("stroke-width", .5)
         .style("z-index", 10)
         .attr("fill", "none");
 
-    renderHex(svg, path, country, places, h3_zoom);
+    renderHex(svg, path);
 
     var zoom = d3.zoom()
         .scaleExtent([0, 40])
@@ -115,12 +121,39 @@ function renderMap(h3_zoom) {
     svg.call(zoom);
 
 }
+function display_data(id){
+    table = ""
+    var cleaned_rows = []
+    h3Hex[id].rows.forEach(r => {
+        if(cleaned_rows[r.scientific_name] == undefined){
+            cleaned_rows[r.scientific_name] = {
+                "scientific_name": r.scientific_name,
+                "common_name": r.common_name,
+                "family": r.family,
+                "individuals": r.no_of_individuals_cleaned,
+                "source": r.source
+            }
+        } else {
+            cleaned_rows[r.scientific_name].individuals += parseInt(r.no_of_individuals_cleaned)
+            if(!cleaned_rows[r.scientific_name].source.includes(r.source))
+                cleaned_rows[r.scientific_name].source += ", " + r.source
+        }
+    })
+    var cleaned = Object.values(cleaned_rows);
+    cleaned.sort(function(a,b) {
+        return b.individuals - a.individuals
+    });
 
-function renderHex(svg, path, country, places, h3_zoom)
+    Object.values(cleaned).forEach(p => {
+        table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td>" + p.family + "</td><td class='text-center'>" + p.individuals + "</td><td>"+p.source+"</td></tr>";
+    })
+
+
+    document.getElementById('map-data').innerHTML = table;
+}
+function renderHex(svg, path)
 {
-    const hexagons = h3.polyfill(country.features[0].geometry.coordinates[0].slice(0, -1).map(d => [d[1], d[0]]), h3_zoom);
-    const coordinates = h3.h3SetToMultiPolygon(hexagons, true);
-    const label_size = h3_zoom*1.2;
+    const label_size = zoom*1.2;
     const hexColor = {
         1: "#D7F4D2",
         2: "#BFEEB7",
@@ -128,81 +161,110 @@ function renderHex(svg, path, country, places, h3_zoom)
         4: "#77DD66"
     };
 
-    d3.select(".hex-content").remove();
+    // d3.select(".hex-content").remove();
 
-    const h3Hexes = svg.append("g").classed("hex-content", true).selectAll("path");
-    const h3_zoom_factor = 5-h3_zoom;
+    const h3Hexes = svg.append("g").classed("hex-content", true).selectAll("path")
 
-    var h3Hex = [];
-    places.forEach(p => {
-        const h3Address = h3.geoToH3(p.latitude, p.longitude, h3_zoom);
-        var matchFlag = false;
-        h3Hex.forEach((h,i) => {
-            if (h.hexID == h3Address) {
-                matchFlag = true;
-                matchID = i;
+    Object.keys(data).forEach(source => {
+        data[source].forEach(p => {
+            const h3Address = h3.geoToH3(p.latitude, p.longitude, zoom)
+
+
+            var matchFlag = false;
+            h3Hex.forEach((h,i) => {
+                if (h.hexID == h3Address) {
+                    matchFlag = true;
+                    matchID = i;
+                }
+            });
+            if (matchFlag == false) {
+                var h3Boundary = h3.h3ToGeoBoundary(h3Address, true);
+                var h3Geo = hexFeatures(h3Boundary);
+                if(source == "butterfly_counts"){
+                    row = []
+                    p.rows.forEach(r => {
+                        row.push({
+                            "scientific_name": r.scientific_name,
+                            "common_name": r.common_name,
+                            "family": r.family,
+                            "no_of_individuals_cleaned": r.no_of_individuals_cleaned,
+                            "source": source
+                        })
+                    })
+                    h3Hex.push({ "hexID": h3Address, "counts":1 , "species_count": p.species, "total": parseInt(p.total), "coordinates": h3Geo, "rows": row });
+
+                } else {
+                        sci_name_cleaned = p.scientific_name.split(' ').slice(0,2).join(' ')
+                    row = {
+                        "scientific_name": sci_name_cleaned,
+                        "common_name": p.common_name,
+                        "family": p.family,
+                        "no_of_individuals_cleaned": 1,
+                        "source": source
+                    }
+                    h3Hex.push({ "hexID": h3Address, "counts":1 , "species_count": 1, "total": 1, "coordinates": h3Geo, "rows": [row] });
+                }
+            }
+            else {
+                if(source == "butterfly_counts"){
+                    row = []
+                    p.rows.forEach(r => {
+                        row.push({
+                            "scientific_name": r.scientific_name,
+                            "common_name": r.common_name,
+                            "family": r.family,
+                            "no_of_individuals_cleaned": r.no_of_individuals_cleaned,
+                            "source": source
+                        })
+                    })
+                    h3Hex[matchID].counts += 1;
+                    h3Hex[matchID].species_count += p.species;
+                    h3Hex[matchID].total += parseInt(p.total);
+                    h3Hex[matchID].rows = h3Hex[matchID].rows.concat(row)
+                } else {
+                    sci_name_cleaned = p.scientific_name.split(' ').slice(0,2).join(' ')
+                    row = {
+                        "scientific_name": sci_name_cleaned,
+                        "common_name": p.common_name,
+                        "family": p.family,
+                        "no_of_individuals_cleaned": 1,
+                        "source": source
+                    }
+                    h3Hex[matchID].counts += 1;
+                    h3Hex[matchID].species_count += 1;
+                    h3Hex[matchID].total += 1;
+                    h3Hex[matchID].rows = h3Hex[matchID].rows.concat(row)
+
+
+                }
+
             }
         });
-        if (matchFlag == false) {
-            const h3Boundary = h3.h3ToGeoBoundary(h3Address, true);
-            const h3Geo = hexFeatures(h3Boundary);
-            h3Hex.push({ "hexID": h3Address, "counts":1 ,"names":p.name, "species_count": p.species, "total": parseInt(p.total), "coordinates": h3Geo });
-            // h3Hex.push({ "hexID": h3Address, "value": p.latitude +','+ p.longitude, "coordinates": h3Geo });
-        }
-        else {
-            h3Hex[matchID].counts += 1;
-            h3Hex[matchID].names += ", " + p.name;
-            h3Hex[matchID].species_count += p.species;
-            h3Hex[matchID].total += parseInt(p.total);
-        }
-        console.log(h3Hex);
     });
+
     const display_field = "species_count";
     // const display_field = "counts";
 
-    h3Hex.forEach(h => {
+    h3Hex.forEach((h,i) => {
         const x = h3Hexes.data(h.coordinates.features)
         const y = x.enter().append("g")
         const digits = h[display_field].toString().length
 
-        y.append("path")
-            .attr("d", path)
-            .attr("stroke-width", ".3")
-            .attr("stroke", "#5a5")
-            .attr("opacity", ".70")
-            .attr("fill", hexColor[digits]);
-
         y.append("text")
             .attr("x", function(h) { return path.centroid(h)[0]; })
             .attr("y", function(h) { return path.centroid(h)[1]; })
-            // .attr("dx", -1*((20*digits)/(h3_zoom+1)))
             .attr("dx", -1*(digits*1.5))
-            // .attr("dy", -1*(25/(h3_zoom+1)))
             .attr("alignment-baseline", "central")
             .style("font-size", label_size)
             .style("font-weight", "bold")
             .style("fill", "#000")
             .text(h[display_field]);
-            // .text(h.names);
 
-        // y.append("text")
-        //     .attr("x", function(h) { return path.centroid(h)[0]; })
-        //     .attr("y", function(h) { return path.centroid(h)[1]; })
-        //     .attr("dx", -2*(50/(h3_zoom+1)))
-        //     .attr("dy", 2.5*(25/(h3_zoom+1)))
-        //     .attr("alignment-baseline", "central")
-        //     .style("font-size", label_size-4)
-        //     .style("fill", "#ff0000")
-        //     .text(h.species_count);
-
-        // y.append("text")
-        //     .attr("x", function(h) { return path.centroid(h)[0]; })
-        //     .attr("y", function(h) { return path.centroid(h)[1]; })
-        //     .attr("dx", -1*Math.pow(digits+3,1.5) )
-        //     .attr("alignment-baseline", "central")
-        //     .style("font-size", 13)
-        //     .style("fill", "#000000")
-        //     .text(h.total);
+        y.append("path")
+            .attr("d", path)
+            .attr("class", "hexagon")
+            .attr("fill", hexColor[digits])
+            .attr('onclick',"display_data('"+i+"')");
 
 
     });
@@ -210,4 +272,5 @@ function renderHex(svg, path, country, places, h3_zoom)
 
 
     </script>
-@endsection
+</body>
+</html>

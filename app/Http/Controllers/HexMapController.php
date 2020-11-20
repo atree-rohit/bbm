@@ -22,12 +22,17 @@ class HexMapController extends Controller
                 }]
             )
             ->withCount("rows as species")
-            ->limit(5)
+            // ->limit(2)
             ->get();
-        $inats = iNat::where("inat_created_at", "like", "%2020-09%")->get();
-        $ibps = IBP::where("createdOn", "like", "%/09/2020%")->get();
+        $inats = iNat::select("id", "user_login as name", "inat_created_at", "latitude", "longitude", "scientific_name", "common_name", "taxon_family_name as family")
+            ->where("inat_created_at", "like", "%2020-09%")
+            // ->limit(2)
+            ->get();
+        $ibps = IBP::select("id", "createdBy as name", "createdOn", "locationLat as latitude", "locationLon as longitude", "scientificName as scientific_name", "commonName as common_name", "family")
+            ->where("createdOn", "like", "%/09/2020%")
+            ->get();
 
-        return view("analysis.maps.index", compact("forms"));
+        return view("analysis.maps.index", compact("forms", "inats", "ibps"));
     }
     public function index_old()
     {
