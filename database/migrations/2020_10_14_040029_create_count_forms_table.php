@@ -23,6 +23,8 @@ class CreateCountFormsTable extends Migration
             $table->text('photo_link')->nullable();
             $table->string('location')->nullable();
             $table->string('coordinates')->nullable();
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->string('date')->nullable();
             $table->date('date_cleaned')->nullable();
             $table->string('altitude')->nullable();
