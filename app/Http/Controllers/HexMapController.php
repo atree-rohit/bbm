@@ -13,22 +13,31 @@ class HexMapController extends Controller
 {
     public function index()
     {
-        $forms = CountForm::where("coordinates", "<>", null)
+        // ini_set('max_execution_time', 300); //3 minutes
+        // $count = 0;
+        // $ibps = IBP::all();
+        // foreach($ibps as $i){
+        //     if(strpos($i->scientificName, " ")){
+        //         $s = explode(" ", $i->scientificName);
+        //         $i->scientificName = $s[0] . " " . $s[1];
+        //         $i->save();
+        //         $count++;
+        //     }
+        // }
+        // dd($count);
+
+        $forms = CountForm::select("id", "name", "latitude", "longitude")
+            ->where("coordinates", "<>", null)
             ->where("duplicate", "false")
-            ->with("rows")
-            ->withCount(
-                ['rows as total' => function ($query) {
-                    $query->select(DB::raw('SUM(no_of_individuals_cleaned)'));
-                }]
-            )
-            ->withCount("rows as species")
-            // ->limit(2)
+            ->with("rows_cleaned")
             ->get();
-        $inats = iNat::select("id", "user_login as name", "inat_created_at", "latitude", "longitude", "scientific_name", "common_name", "taxon_family_name as family")
+        
+        // $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name", "common_name", "taxon_family_name as family")
+        $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name", "common_name")
             ->where("inat_created_at", "like", "%2020-09%")
             // ->limit(2)
             ->get();
-        $ibps = IBP::select("id", "createdBy as name", "createdOn", "locationLat as latitude", "locationLon as longitude", "scientificName as scientific_name", "commonName as common_name", "family")
+        $ibps = IBP::select("createdBy as name", "locationLat as latitude", "locationLon as longitude", "scientificName as scientific_name", "commonName as common_name")
             ->where("createdOn", "like", "%/09/2020%")
             ->get();
 
