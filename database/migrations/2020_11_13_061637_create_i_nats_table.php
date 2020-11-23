@@ -34,6 +34,7 @@ class CreateINatsTable extends Migration
             $table->string('coordinates_obscured')->nullable();
             $table->string('species_guess')->nullable();
             $table->string('scientific_name')->nullable();
+            $table->string('scientific_name_cleaned')->nullable();
             $table->string('common_name')->nullable();
             $table->bigInteger('taxon_id')->nullable();
             $table->string('taxon_family_name')->nullable();
