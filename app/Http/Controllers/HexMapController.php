@@ -13,8 +13,22 @@ class HexMapController extends Controller
 {
     public function index()
     {
-        // ini_set('max_execution_time', 300); //3 minutes
-        // $count = 0;
+        /*
+        ini_set('max_execution_time', 300);
+        $count = 0;
+
+        $forms = FormRow::all();
+        foreach($forms as $f){
+            if(!strpos($f->scientific_name, " ")){
+                // $s = explode(" ", $f->scientific_name);
+                // $f->scientific_name_cleaned = $s[0] . " " . $s[1];
+                $f->scientific_name_cleaned = $f->scientific_name;
+                $f->save();
+                $count++;
+            }
+        }
+        dd($count);
+        */
         // $ibps = IBP::all();
         // foreach($ibps as $i){
         //     if(strpos($i->scientificName, " ")){
@@ -26,22 +40,25 @@ class HexMapController extends Controller
         // }
         // dd($count);
 
-        $forms = CountForm::select("id", "name", "latitude", "longitude")
+        $forms = CountForm::select("id", "name", "latitude", "longitude", "location as place")
             ->where("coordinates", "<>", null)
             ->where("duplicate", "false")
             ->with("rows_cleaned")
+            // ->limit(100)
             ->get();
         
         // $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name", "common_name", "taxon_family_name as family")
-        $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name", "common_name")
+        $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name_cleaned as scientific_name", "common_name", "place_guess as place")
             ->where("inat_created_at", "like", "%2020-09%")
-            // ->limit(2)
+            // ->limit(100)
             ->get();
-        $ibps = IBP::select("createdBy as name", "locationLat as latitude", "locationLon as longitude", "scientificName as scientific_name", "commonName as common_name")
+        $ibps = IBP::select("createdBy as name", "locationLat as latitude", "locationLon as longitude", "scientificName as scientific_name", "commonName as common_name", "placeName as place")
             ->where("createdOn", "like", "%/09/2020%")
+            // ->limit(100)
             ->get();
 
-        return view("analysis.maps.index", compact("forms", "inats", "ibps"));
+        // return view("analysis.maps.index", compact("forms", "inats", "ibps"));
+        return view("analysis.maps.states", compact("forms", "inats", "ibps"));
     }
     public function index_old()
     {
