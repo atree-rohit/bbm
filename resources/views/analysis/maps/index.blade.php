@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" integrity="sha512-U3BExhsSSzrscvztemnZwpCsZfbKnEFXOIezIrAi3y7sjiALdlRQsknCyp/KBKnaJZxjQXvLBT4UPkyq06BnJA==" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/h3-js"></script>
-    <script src="{{ asset('js/country.js') }}"></script>
+    <script src="{{ asset('js/country_r.js') }}"></script>
     <style>
         .hexagon{
             stroke-width:.3;
@@ -26,18 +26,21 @@
         <div id="map-container" class="svg-container bg-light col"></div>
 
         <div class="col table-info" style="max-height: 95vh;overflow-y: scroll;">
-            <div id="map_controls container-fluid d-flex justify-content-around" class="border border-success">
-                <div class="row">
+            <div id="map_controls" class="border border-success table-success">
+                <div class="row m-3 text-center">
                     <div class="col">
                         <div class="slidecontainer">
-                            <h4>Hexagon Size: <span id="zoom_value"></span></h4>
-                            <input type="range" min="1" max="7" value="4" class="slider" id="zoom_slider">
+                            <h4>Hexagon Size: <span class="h1 text-danger" id="zoom_value"></span></h4>
+                            <input type="range" min="1" max="7" value="4" class="slider w-100" id="zoom_slider" >
                         </div>
                     </div>
                     <div class="col">
+                        <h4>Filter by Species</h4>
+                        <input type="search" class="form-control mb-3" id="selectedSpecies" list="selectSpecies" onchange="selectSpeciesFunction()">
+                        <datalist id="selectSpecies">
+                        </datalist>
 
-                        Filter by Species<select class="custom-select custom-select-lg mb-3" id="selectSpecies"></select>
-
+                        {{-- <select class="custom-select custom-select-lg mb-3" id="selectSpecies" "></select> --}}
                     </div>
                     
                 </div>
@@ -63,7 +66,11 @@
                     </div>
                 </div>
             </div>
-            <div class="my-2 border border-danger px-3 bg-light text-center">
+            <div class="my-2 border border-danger px-3 bg-light text-center" style="max-height: 25vh;overflow-y: scroll;">
+                <h3>Places</h3>
+                <div id="places" class="row"></div>
+            </div>
+            <div class="my-2 border border-danger px-3 bg-light text-center" style="max-height: 25vh;overflow-y: scroll;">
                 <h3>Observers</h3>
                 <div id="observers" class="row"></div>
             </div>
@@ -81,26 +88,28 @@
         </div>
     </div>
 <script>
-    
-    const svgWidth = window.innerWidth / 2
-    const svgHeight = window.innerHeight - 30
-
-    var h3Hex = []
     const data = {
          "butterfly_counts": @json($forms),
          "inat": @json($inats),
          "ibp": @json($ibps)
     }
-    var zoom = 4
+
+        
+    const svgWidth = window.innerWidth / 2
+    const svgHeight = window.innerHeight - 30
+
+    var h3Hex = []
+    var filterSpecies = "ALL"
     var svg = 0
     var path = 0
+    var zoom = 4
     var species_list = []
 
     renderMap()
 
     var slider = document.getElementById("zoom_slider")
     var output = document.getElementById("zoom_value")
-    output.innerHTML = slider.value
+    output.innerHTML = zoom
 
     slider.oninput = function() {
         output.innerHTML = this.value
@@ -117,7 +126,8 @@
                 species_list.push(p.scientific_name)
         });
     });
-    var options = species_list.sort();
+    var options = species_list.sort()
+    options.unshift("ALL")
 
     for(var i = 0; i < options.length; i++) {
         var opt = options[i]
@@ -125,6 +135,14 @@
         el.textContent = opt
         el.value = opt
         select.appendChild(el)
+    }
+
+    function selectSpeciesFunction(){
+        filterSpecies = document.getElementById("selectedSpecies").value
+        console.log(filterSpecies)
+        d3.selectAll("svg").remove()
+        h3Hex = []
+        renderMap()
     }
      
     function hexFeatures(array) {
@@ -197,24 +215,39 @@
             total_individuals += parseInt(r.individuals)
         })
         var unique_observers = h3Hex[id].rows.map(function(value,index) { 
-            return value["names"] + " (" + value["source"] +")"; 
+            return value["names"] + "-" + value["source"]
         }).filter(function(v, i, self){
-            return i == self.indexOf(v);
+            return i == self.indexOf(v)
         }); 
         observers = "";
         unique_observers.forEach(o => {
             if(o.includes("ibp"))
-                observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o+'</div>'
+                observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
             else if (o.includes("inat"))
-                observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o+'</div>'
+                observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
             else
-                observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o+'</div>'
+                observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
+        })
+        var unique_places = h3Hex[id].rows.map(function(value,index) { 
+            return value["place"].replace(", India", "").trim() + "-" + value.source
+        }).filter(function(v, i, self){
+            return i == self.indexOf(v);
+        }) 
+        places = "";
+        unique_places.forEach(p => {
+            if(p.includes("ibp"))
+                places += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+p.replace("-ibp", "")+'</div>'
+            else if (p.includes("inat"))
+                places += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+p.replace("-inat", "")+'</div>'
+            else
+                places += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+p.replace("-butterfly_counts", "")+'</div>'
         })
         document.getElementById('data-species').innerHTML = unique_species.length
         document.getElementById('data-individuals').innerHTML = total_individuals
         document.getElementById('data-observers').innerHTML = unique_observers.length
         
         document.getElementById('observers').innerHTML = observers
+        document.getElementById('places').innerHTML = places
         
 
         h3Hex[id].rows.forEach(r => {
@@ -245,6 +278,36 @@
 
         document.getElementById('map-data').innerHTML = table;
     }
+    function parseButterflyData(data, source){
+        row = []
+        if(source == "butterfly_counts"){
+            data.rows_cleaned.forEach(r => {
+                if(filterSpecies == "ALL" || filterSpecies == r.scientific_name){
+                    row.push({
+                        "scientific_name": r.scientific_name,
+                        "common_name": r.common_name,
+                        "individuals": parseInt(r.individuals),
+                        "names": data.name,
+                        "place": data.place,
+                        "source": source
+                    })                    
+                }
+            })
+        } else {
+            if(filterSpecies == "ALL" || filterSpecies == data.scientific_name){
+                row = [{
+                    "scientific_name": data.scientific_name,
+                    "common_name": data.common_name,
+                    "individuals": 1,
+                    "names": data.name,
+                    "place": data.place,
+                    "source": source
+                }]
+            }
+
+        }
+        return row
+    }
     function renderHex(svg, path)
     {
         const label_size = {
@@ -265,64 +328,24 @@
                 var matchFlag = false;
                 h3Hex.forEach((h,i) => {
                     if (h.hexID == h3Address) {
-                        matchFlag = true;
-                        matchID = i;
+                        matchFlag = true
+                        matchID = i
                     }
-                });
-                if (matchFlag == false) {
-                    var h3Boundary = h3.h3ToGeoBoundary(h3Address, true);
-                    var h3Geo = hexFeatures(h3Boundary);
-                    if(source == "butterfly_counts"){
-                        row = []
-                        p.rows_cleaned.forEach(r => {
-                            row.push({
-                                "scientific_name": r.scientific_name,
-                                "common_name": r.common_name,
-                                "individuals": parseInt(r.individuals),
-                                "names": p.name,
-                                "source": source
-                            })
-                        })
-                        h3Hex.push({ "hexID": h3Address, "coordinates": h3Geo, "rows": row });
+                })
+                row = parseButterflyData(p, source)
 
-                    } else {
-                        row = {
-                            "scientific_name": p.scientific_name,
-                            "common_name": p.common_name,
-                            "individuals": 1,
-                            "names": p.name,
-                            "source": source
-                        }
-                        h3Hex.push({ "hexID": h3Address, "coordinates": h3Geo, "rows": [row] });
+                if(row.length > 0){
+                    if (matchFlag == false) {
+                        var h3Boundary = h3.h3ToGeoBoundary(h3Address, true)
+                        var h3Geo = hexFeatures(h3Boundary)
+                        h3Hex.push({ "hexID": h3Address, "coordinates": h3Geo, "rows": row })
                     }
-                }
-                else {
-                    if(source == "butterfly_counts"){
-                        row = []
-                        p.rows_cleaned.forEach(r => {
-                            row.push({
-                                "scientific_name": r.scientific_name,
-                                "common_name": r.common_name,
-                                "individuals": parseInt(r.individuals),
-                                "names": p.name,
-                                "source": source
-                            })
-                        })
+                    else {
                         h3Hex[matchID].rows = h3Hex[matchID].rows.concat(row)
-                    } else {
-                        row = {
-                            "scientific_name": p.scientific_name,
-                            "common_name": p.common_name,
-                            "individuals": 1,
-                            "names": p.name,
-                            "source": source
-                        }
-                        h3Hex[matchID].rows = h3Hex[matchID].rows.concat(row)
-                    }
-
+                    }                    
                 }
-            });
-        });
+            })
+        })
         
 
         h3Hex.forEach((h,i) => {
@@ -358,6 +381,7 @@
                 .attr('onclick',"display_data('"+i+"')")
         });
     }
+    
 
 </script>
 </body>
