@@ -24,7 +24,7 @@ class CountForm extends Model
 
     public function rows_cleaned()
     {
-        return $this->hasMany(FormRow::class)->select(["id","common_name", "scientific_name", "no_of_individuals_cleaned as individuals","count_form_id"]);
+        return $this->hasMany(FormRow::class)->select(["id","common_name", "scientific_name_cleaned as scientific_name", "no_of_individuals_cleaned as individuals","count_form_id"]);
     }
 
 }
