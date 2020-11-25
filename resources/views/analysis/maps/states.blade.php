@@ -29,19 +29,8 @@
         <div id="map-container" class="svg-container bg-light col"></div>
 
         <div class="col table-info" style="max-height: 95vh;overflow-y: scroll;">
-            <div id="map_controls" class="border border-success table-success">
-                <div class="row m-3 text-center">
-                    <div class="col">
-                        <h4>Filter by Species</h4>
-                        <input type="search" class="form-control mb-3" id="selectedSpecies" list="selectSpecies" onchange="selectSpeciesFunction()">
-                        <datalist id="selectSpecies">
-                        </datalist>
-
-                        {{-- <select class="custom-select custom-select-lg mb-3" id="selectSpecies" "></select> --}}
-                    </div>
-
-                </div>
-
+            <div id="map_controls" class="border border-success table-success text-center">
+                <div id="places" class="h1 d-block"></div>
             </div>
             <div class="d-flex justify-content-around my-2 text-light text-center">
                 <div class="card bg-info">
@@ -62,10 +51,6 @@
                         <h3 class="card-subtitle mb-2">Observers</h3>
                     </div>
                 </div>
-            </div>
-            <div class="my-2 border border-danger px-3 bg-light text-center" style="max-height: 25vh;overflow-y: scroll;">
-                <h3>Places</h3>
-                <div id="places" class="row"></div>
             </div>
             <div class="my-2 border border-danger px-3 bg-light text-center" style="max-height: 25vh;overflow-y: scroll;">
                 <h3>Observers</h3>
@@ -95,33 +80,17 @@
     var path = 0
     var zoom = 4
     var species_list = []
+    var state_data = []
+
+    data.forEach(s => {
+        if(state_data[s[7]] == undefined)
+            state_data[s[7]] = []
+        state_data[s[7]].push(s)
+    })
+
+
 
     renderMap()
-
-    var select = document.getElementById("selectSpecies")
-    data.forEach(p => {
-        if(!species_list.includes(p.scientific_name))
-            species_list.push(p.scientific_name)
-    });
-
-    var options = species_list.sort()
-    options.unshift("ALL")
-
-    for(var i = 0; i < options.length; i++) {
-        var opt = options[i]
-        var el = document.createElement("option")
-        el.textContent = opt
-        el.value = opt
-        select.appendChild(el)
-    }
-
-    function selectSpeciesFunction(){
-        filterSpecies = document.getElementById("selectedSpecies").value
-        console.log(filterSpecies)
-        d3.selectAll("svg").remove()
-        h3Hex = []
-        renderMap()
-    }
 
     function hexFeatures(array) {
         const geoJSON = {
@@ -200,7 +169,7 @@
                 .attr("stroke-width", .5)
                 .style("z-index", 10)
                 .attr("fill", "#fff")
-                .on("click", (d) => console.log(d.properties.ST_NM))
+                .on("click", (d) => display_data(d.properties.ST_NM))
         })
         // renderHex(svg, path)
 
@@ -218,47 +187,64 @@
         svg.call(zoom);
 
     }
-    function display_data(id){
+    function display_data(state){
         table = ""
         var cleaned_rows = []
-
-        var unique_species = h3Hex[id].rows.map(function(value,index) {
-            return value["scientific_name"];
-        }).filter(function(v, i, self){
-            return i == self.indexOf(v);
+        var places = state
+        if(state_data[state] == undefined){
+            unique_species = "-"
+            total_individuals = "-"
+            observers = "-"
+            unique_observers = ""
+            cleaned = ""
+        } else {
+            var unique_species = state_data[state].map(function(value,index) {
+                return value[4];
+            }).filter(function(v, i, self){
+                return i == self.indexOf(v);
+            })
+            var total_individuals = 0
+            state_data[state].forEach(r => {
+                total_individuals += parseInt(r[5])
+            })
+            var unique_observers = state_data[state].map(function(value,index) {
+                return value[0] + "-" + value[6]
+            }).filter(function(v, i, self){
+                return i == self.indexOf(v)
+            });
+            observers = "";
+            unique_observers.forEach(o => {
+                if(o.includes("ibp"))
+                    observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
+                else if (o.includes("inat"))
+                    observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
+                else
+                    observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
+            })
+            state_data[state].forEach(r => {
+            if(cleaned_rows[r[4]] == undefined){
+                cleaned_rows[r[4]] = {
+                    "scientific_name": r[4],
+                    "common_name": r[3],
+                    "individuals": parseInt(r[5]),
+                    "names": r[0],
+                    "source": r[6]
+                }
+            } else {
+                cleaned_rows[r[4]].individuals += parseInt(r[5])
+                if(!cleaned_rows[r[4]].source.includes(r[6]))
+                    cleaned_rows[r[4]].source += ", " + r[6]
+                if(!cleaned_rows[r[4]].names.includes(r.names))
+                    cleaned_rows[r[4]].names += ", " + r[0]
+            }
         })
-        var total_individuals = 0
-        h3Hex[id].rows.forEach(r => {
-            total_individuals += parseInt(r.individuals)
-        })
-        var unique_observers = h3Hex[id].rows.map(function(value,index) {
-            return value["names"] + "-" + value["source"]
-        }).filter(function(v, i, self){
-            return i == self.indexOf(v)
+        var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
+            return b.individuals - a.individuals
         });
-        observers = "";
-        unique_observers.forEach(o => {
-            if(o.includes("ibp"))
-                observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
-            else if (o.includes("inat"))
-                observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
-            else
-                observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
-        })
-        var unique_places = h3Hex[id].rows.map(function(value,index) {
-            return value["place"].replace(", India", "").trim() + "-" + value.source
-        }).filter(function(v, i, self){
-            return i == self.indexOf(v);
-        })
-        places = "";
-        unique_places.forEach(p => {
-            if(p.includes("ibp"))
-                places += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+p.replace("-ibp", "")+'</div>'
-            else if (p.includes("inat"))
-                places += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+p.replace("-inat", "")+'</div>'
-            else
-                places += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+p.replace("-butterfly_counts", "")+'</div>'
-        })
+
+        }
+
+
         document.getElementById('data-species').innerHTML = unique_species.length
         document.getElementById('data-individuals').innerHTML = total_individuals
         document.getElementById('data-observers').innerHTML = unique_observers.length
@@ -267,26 +253,6 @@
         document.getElementById('places').innerHTML = places
 
 
-        h3Hex[id].rows.forEach(r => {
-            if(cleaned_rows[r.scientific_name] == undefined){
-                cleaned_rows[r.scientific_name] = {
-                    "scientific_name": r.scientific_name,
-                    "common_name": r.common_name,
-                    "individuals": parseInt(r.individuals),
-                    "names": r.names,
-                    "source": r.source
-                }
-            } else {
-                cleaned_rows[r.scientific_name].individuals += parseInt(r.individuals)
-                if(!cleaned_rows[r.scientific_name].source.includes(r.source))
-                    cleaned_rows[r.scientific_name].source += ", " + r.source
-                if(!cleaned_rows[r.scientific_name].names.includes(r.names))
-                    cleaned_rows[r.scientific_name].names += ", " + r.names
-            }
-        })
-        var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
-            return b.individuals - a.individuals
-        });
 
         Object.values(cleaned).forEach(p => {
             table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td class='text-center'>" + p.individuals +  "</td><td>"+p.source+"</td></tr>";

@@ -2,8 +2,6 @@ const point_in_state = [
         ['neelam2', 11.587888, 92.65564, 'Buckeyes & Pansies', 'Junonia', 1, 'inat', 'Andaman & Nicobar'],
         ['anirudhsrivastha', 13.56056337, 78.49489342, 'Crimson Rose Swallowtail', 'Pachliopta hector', 1, 'inat', 'Andhra Pradesh'],
         ['rajabandi', 16.62033167, 80.78325997, 'Common Grass Yellow', 'Eurema hecabe', 1, 'inat', 'Andhra Pradesh'],
-        ]
-const temp = [
         ['rajabandi', 16.61961333, 80.78514997, 'Common Leopard', 'Phalanta phalantha', 1, 'inat', 'Andhra Pradesh'],
         ['rajabandi', 16.61899833, 80.78762997, 'Lemon Pansy', 'Junonia lemonias', 1, 'inat', 'Andhra Pradesh'],
         ['rajabandi', 16.61796497, 80.79237331, 'Lemon Pansy', 'Junonia lemonias', 1, 'inat', 'Andhra Pradesh'],
