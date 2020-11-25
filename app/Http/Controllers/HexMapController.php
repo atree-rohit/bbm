@@ -13,32 +13,7 @@ class HexMapController extends Controller
 {
     public function index()
     {
-        /*
         ini_set('max_execution_time', 300);
-        $count = 0;
-
-        $forms = FormRow::all();
-        foreach($forms as $f){
-            if(!strpos($f->scientific_name, " ")){
-                // $s = explode(" ", $f->scientific_name);
-                // $f->scientific_name_cleaned = $s[0] . " " . $s[1];
-                $f->scientific_name_cleaned = $f->scientific_name;
-                $f->save();
-                $count++;
-            }
-        }
-        dd($count);
-        */
-        // $ibps = IBP::all();
-        // foreach($ibps as $i){
-        //     if(strpos($i->scientificName, " ")){
-        //         $s = explode(" ", $i->scientificName);
-        //         $i->scientificName = $s[0] . " " . $s[1];
-        //         $i->save();
-        //         $count++;
-        //     }
-        // }
-        // dd($count);
 
         $forms = CountForm::select("id", "name", "latitude", "longitude", "location as place")
             ->where("coordinates", "<>", null)
@@ -46,9 +21,10 @@ class HexMapController extends Controller
             ->with("rows_cleaned")
             // ->limit(100)
             ->get();
-        
+
+
         // $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name", "common_name", "taxon_family_name as family")
-        $inats = iNat::select( "user_login as name", "latitude", "longitude", "scientific_name_cleaned as scientific_name", "common_name", "place_guess as place")
+        $inats = iNat::select("user_login as name", "latitude", "longitude", "scientific_name_cleaned as scientific_name", "common_name", "place_guess as place")
             ->where("inat_created_at", "like", "%2020-09%")
             // ->limit(100)
             ->get();
@@ -57,9 +33,48 @@ class HexMapController extends Controller
             // ->limit(100)
             ->get();
 
+        // echo "<table border='0'>";
+        // echo "<thead><th>Name</th><th>Latitude</th><th>Longitude</th><th>Place</th><th>Common Name</th><th>Scientific Name</th><th>Individuals</th><th>Source</th>";
+        // foreach ($forms as $f) {
+        //     foreach ($f->rows_cleaned as $r) {
+        //         echo "<tr>";
+        //         echo "<td>".$f->name."</td>";
+        //         echo "<td>".$f->latitude."</td>";
+        //         echo "<td>".$f->longitude."</td>";
+        //         echo "<td>".$f->place."</td>";
+        //         foreach (["common_name", "scientific_name", "individuals"] as $col) {
+        //             echo "<td>".$r->{$col}."</td>";
+        //         }
+        //         echo "<td>counts</td>";
+        //         echo "</tr>";
+        //     }
+        // }
+        // foreach ($inats as $i) {
+        //     echo "<tr>";
+        //     foreach (["name", "latitude", "longitude", "place", "common_name", "scientific_name"] as $col) {
+        //         echo "<td>".$i->{$col}."</td>";
+        //     }
+        //     echo "<td>1</td>";
+        //     echo "<td>inat</td>";
+        //     echo "</tr>";
+        // }
+        // foreach ($ibps as $i) {
+        //     echo "<tr>";
+        //     foreach (["name", "latitude", "longitude", "place", "common_name", "scientific_name"] as $col) {
+        //         echo "<td>".$i->{$col}."</td>";
+        //     }
+        //     echo "<td>1</td>";
+        //     echo "<td>ibp</td>";
+        //     echo "</tr>";
+        // }
+        // echo "</table>";
+        // dd();
         // return view("analysis.maps.index", compact("forms", "inats", "ibps"));
-        return view("analysis.maps.states", compact("forms", "inats", "ibps"));
+        return view("analysis.maps.states");
     }
+
+
+
     public function index_old()
     {
         $forms_raw = CountForm::with("rows")->where("coordinates", "<>", null)->where("duplicate", "false")->get();
