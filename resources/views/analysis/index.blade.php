@@ -33,7 +33,6 @@
 	    </table>
 	</div>
 
-
 @endsection
 
 @section('script')
@@ -44,5 +43,4 @@
 	    $('#analysisTable').DataTable();
 	} );
 </script>
-
 @endsection
