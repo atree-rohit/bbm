@@ -120,7 +120,7 @@
 
     calculateLabels(label_type)
     renderMap()
-    display_data("None")
+    display_data("All")
 
     const label_button = {
         "state_name": "State Name",
@@ -145,7 +145,7 @@
 
     function toggle_button(e){
         if(document.getElementById(e).classList.contains("btn-success")){
-            label_type = "none"
+            label_type = "All"
             Object.values(document.getElementById("btn_gp").children).forEach(c => {
                 document.getElementById(c.id).classList.remove("btn-success")
                 document.getElementById(c.id).classList.add("btn-outline-danger")
@@ -163,7 +163,7 @@
         }
         calculateLabels(label_type)
         renderMap()
-        display_data("None")
+        display_data("All")
     }
 
     function calculateLabels(label_type){
@@ -241,7 +241,7 @@
                 .attr("id", (d) => d.properties.ST_NM)
                 .attr("stroke-width", .5)
                 .on("click", (d) => display_data(d.properties.ST_NM))
-            if(label_type == "state_name")
+            if(label_type == "state_name" || label_type == "All")
                 x.attr("fill", "#aaa")
             else
                 x.attr("fill", (d) => colors(state_species[d.properties.ST_NM]))
@@ -257,7 +257,7 @@
                     .on("click", (d) => display_data(d.properties.ST_NM))
             if(label_type == "state_name")
                 x.text((d) => d.properties.ST_NM)
-            else if(label_type !== "none")
+            else if(label_type != "All")
                 x.text((d) => state_species[d.properties.ST_NM])
         })
         svg.append("g")
@@ -280,38 +280,47 @@
     function display_data(state){
         table = ""
         var cleaned_rows = []
-
-        polygons = document.getElementsByClassName("map-boundary")[0].children
-
-        if(state != "None"){
-            current_classes = document.getElementById(state).classList
-            if(current_classes.length > 0)
-                state = "None"
-        }
-        Object.values(polygons).forEach(p => {
+        Object.values(document.getElementsByClassName("map-boundary")[0].children).forEach(p => {
             if(p.id === state)
                 document.getElementById(p.id).classList.add("selected_polygon")
             else if(document.getElementById(p.id) != null)
                 document.getElementById(p.id).classList.remove("selected_polygon")
         })
-        if(state_data[state] == undefined){
-            unique_species = ""
-            total_individuals = "0"
-            observers = "-"
-            unique_observers = ""
-            cleaned = ""
-        } else {
-            var unique_species = state_data[state].map(function(value,index) {
-                return value[4];
+
+        if(state == "All"){
+            Object.values(state_data).forEach(s => {
+                s.forEach(r => {
+                    if(cleaned_rows[r[4]] == undefined){
+                        cleaned_rows[r[4]] = {
+                            "scientific_name": r[4],
+                            "common_name": r[3],
+                            "individuals": parseInt(r[5]),
+                            "names": r[0],
+                            "source": r[6]
+                        }
+                    } else {
+                        cleaned_rows[r[4]].individuals += parseInt(r[5])
+                        if(!cleaned_rows[r[4]].source.includes(r[6]))
+                            cleaned_rows[r[4]].source += ", " + r[6]
+                    }
+                })
+            })
+            var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
+                return b.individuals - a.individuals
+            })
+            console.log(cleaned[0])
+
+            var unique_species = cleaned.map(function(value,index) {
+                return value.scientific_name;
             }).filter(function(v, i, self){
                 return i == self.indexOf(v);
             })
             var total_individuals = 0
-            state_data[state].forEach(r => {
-                total_individuals += parseInt(r[5])
+            cleaned.forEach(r => {
+                total_individuals += parseInt(r.individuals)
             })
-            var unique_observers = state_data[state].map(function(value,index) {
-                return value[0] + "-" + value[6]
+            var unique_observers = cleaned.map(function(value,index) {
+                return value.names + "-" + value.source
             }).filter(function(v, i, self){
                 return i == self.indexOf(v)
             });
@@ -324,27 +333,63 @@
                 else
                     observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
             })
-            state_data[state].forEach(r => {
-                if(cleaned_rows[r[4]] == undefined){
-                    cleaned_rows[r[4]] = {
-                        "scientific_name": r[4],
-                        "common_name": r[3],
-                        "individuals": parseInt(r[5]),
-                        "names": r[0],
-                        "source": r[6]
-                    }
-                } else {
-                    cleaned_rows[r[4]].individuals += parseInt(r[5])
-                    if(!cleaned_rows[r[4]].source.includes(r[6]))
-                        cleaned_rows[r[4]].source += ", " + r[6]
-                    if(!cleaned_rows[r[4]].names.includes(r.names))
-                        cleaned_rows[r[4]].names += ", " + r[0]
-                }
-            })
-            var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
-                return b.individuals - a.individuals
-            })
         }
+        else
+        {
+
+            if(state_data[state] == undefined){
+                unique_species = ""
+                total_individuals = "0"
+                observers = "-"
+                unique_observers = ""
+                cleaned = ""
+            } else {
+                var unique_species = state_data[state].map(function(value,index) {
+                    return value[4];
+                }).filter(function(v, i, self){
+                    return i == self.indexOf(v);
+                })
+                var total_individuals = 0
+                state_data[state].forEach(r => {
+                    total_individuals += parseInt(r[5])
+                })
+                var unique_observers = state_data[state].map(function(value,index) {
+                    return value[0] + "-" + value[6]
+                }).filter(function(v, i, self){
+                    return i == self.indexOf(v)
+                });
+                observers = "";
+                unique_observers.forEach(o => {
+                    if(o.includes("ibp"))
+                        observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
+                    else if (o.includes("inat"))
+                        observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
+                    else
+                        observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
+                })
+                state_data[state].forEach(r => {
+                    if(cleaned_rows[r[4]] == undefined){
+                        cleaned_rows[r[4]] = {
+                            "scientific_name": r[4],
+                            "common_name": r[3],
+                            "individuals": parseInt(r[5]),
+                            "names": r[0],
+                            "source": r[6]
+                        }
+                    } else {
+                        cleaned_rows[r[4]].individuals += parseInt(r[5])
+                        if(!cleaned_rows[r[4]].source.includes(r[6]))
+                            cleaned_rows[r[4]].source += ", " + r[6]
+                        if(!cleaned_rows[r[4]].names.includes(r.names))
+                            cleaned_rows[r[4]].names += ", " + r[0]
+                    }
+                })
+                var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
+                    return b.individuals - a.individuals
+                })
+            }
+        }
+
 
         Object.values(cleaned).forEach(p => {table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td class='text-center'>" + p.individuals + "</td><td>"+p.source+"</td></tr>"})
         document.getElementById('data-species').innerHTML = unique_species.length
