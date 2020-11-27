@@ -110,7 +110,17 @@
     var state_species = []
 
     var largest_total = 0
-    var label_type = "unique_taxa"
+    var label_type = "individuals"
+
+    data.forEach(s => {
+        if(state_data[s[7]] == undefined)
+            state_data[s[7]] = []
+        state_data[s[7]].push(s)
+    })
+
+    calculateLabels(label_type)
+    renderMap()
+    display_data("None")
 
     const label_button = {
         "state_name": "State Name",
@@ -123,7 +133,7 @@
         element.type = "button"
         element.value = k
         element.id = k + "_btn"
-        if(k == "state")
+        if(k == label_type)
             element.setAttribute("class", "btn  btn-success")
         else
         element.setAttribute("class", "btn  btn-outline-danger")
@@ -134,22 +144,30 @@
     })
 
     function toggle_button(e){
-        label_type = e.replace("_btn", "")
-        document.getElementById(e).classList.toggle("btn-outline-danger")
-        document.getElementById(e).classList.toggle("btn-success")
+        if(document.getElementById(e).classList.contains("btn-success")){
+            label_type = "none"
+            Object.values(document.getElementById("btn_gp").children).forEach(c => {
+                document.getElementById(c.id).classList.remove("btn-success")
+                document.getElementById(c.id).classList.add("btn-outline-danger")
+            })
+        } else {
+            label_type = e.replace("_btn", "")
+            Object.values(document.getElementById("btn_gp").children).forEach(c => {
+                if(c.id !== e){
+                    document.getElementById(c.id).classList.remove("btn-success")
+                    document.getElementById(c.id).classList.add("btn-outline-danger")
+                }
+            })
+            document.getElementById(e).classList.remove("btn-outline-danger")
+            document.getElementById(e).classList.add("btn-success")
+        }
         calculateLabels(label_type)
-    renderMap()
-    display_data("None")
+        renderMap()
+        display_data("None")
     }
 
-    data.forEach(s => {
-
-        if(state_data[s[7]] == undefined)
-            state_data[s[7]] = []
-        state_data[s[7]].push(s)
-    })
-
     function calculateLabels(label_type){
+        largest_total = 0
         if(label_type == "unique_taxa"){
             Object.keys(state_data).forEach(s => {
                 var uniques = state_data[s].map(function(value,index) {
@@ -162,11 +180,21 @@
                 state_species[s] = uniques.length
             })
         }
-        if(label_type == "individuals"){
-            total
+        else if(label_type == "individuals"){
             Object.keys(state_data).forEach(s => {
+                state_total = 0
                 state_data[s].forEach(r => {
-                        return value[4];
+                        state_total += r[5]
+                })
+                if(state_total > largest_total)
+                    largest_total = state_total
+                state_species[s] = state_total
+            })
+        }
+        else if(label_type == "observers"){
+            Object.keys(state_data).forEach(s => {
+                var uniques = state_data[s].map(function(value,index) {
+                        return value[0] +"-"+value[6];
                     }).filter(function(v, i, self){
                         return i == self.indexOf(v);
                     })
@@ -174,12 +202,10 @@
                     largest_total = uniques.length
                 state_species[s] = uniques.length
             })
+
         }
     }
 
-    calculateLabels(label_type)
-    renderMap()
-    display_data("None")
 
 
     function renderMap() {
@@ -193,7 +219,7 @@
             .classed("svg-content", true)
         var projection = d3.geoMercator().scale(1400).center([85.5, 29.5])
         path = d3.geoPath().projection(projection)
-        const colors = d3.scaleLinear().domain([0, 1, 500]).range(["#999", "#f77", "#7f7"])
+        const colors = d3.scaleLinear().domain([0, 1, largest_total]).range(["#999", "#f77", "#7f7"])
         var legend = d3.legendColor().scale(colors).shapeWidth(55).labelFormat(d3.format(".0f")).orient('horizontal').cells(6)
 
 
@@ -207,15 +233,18 @@
         country.features.forEach(state=> {
             if(state_species[state.properties.ST_NM] == undefined)
                 state_species[state.properties.ST_NM] = 0
-            base.append("g")
+            x = base.append("g")
                 .data([state])
                 .enter().append("path")
                 .attr("d", path)
                 .attr("stroke", "#333")
                 .attr("id", (d) => d.properties.ST_NM)
                 .attr("stroke-width", .5)
-                .attr("fill", (d) => colors(state_species[d.properties.ST_NM]))
                 .on("click", (d) => display_data(d.properties.ST_NM))
+            if(label_type == "state_name")
+                x.attr("fill", "#aaa")
+            else
+                x.attr("fill", (d) => colors(state_species[d.properties.ST_NM]))
         })
         country.features.forEach(state=> {
             x = base_text.append("g")
@@ -228,7 +257,7 @@
                     .on("click", (d) => display_data(d.properties.ST_NM))
             if(label_type == "state_name")
                 x.text((d) => d.properties.ST_NM)
-            else if(label_type == "unique_taxa")
+            else if(label_type !== "none")
                 x.text((d) => state_species[d.properties.ST_NM])
         })
         svg.append("g")
