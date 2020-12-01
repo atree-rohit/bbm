@@ -28,7 +28,7 @@
         }
         /*width*/
         ::-webkit-scrollbar {
-          width: 10px;
+          width: 7px;
         }
 
         /* Track */
@@ -105,11 +105,10 @@
     var svg = 0
     var path = 0
     var zoom = 4
-    var species_list = []
     var state_data = []
-    var state_species = []
+    var processed_data = []
 
-    var largest_total = 0
+    var largest_total = []
     var label_type = "individuals"
 
     data.forEach(s => {
@@ -121,6 +120,7 @@
     calculateLabels(label_type)
     renderMap()
     display_data("All")
+
 
     const label_button = {
         "state_name": "State Name",
@@ -167,43 +167,58 @@
     }
 
     function calculateLabels(label_type){
-        largest_total = 0
-        if(label_type == "unique_taxa"){
-            Object.keys(state_data).forEach(s => {
-                var uniques = state_data[s].map(function(value,index) {
+        largest_unique = 0
+        largest_individual = 0
+        largest_observers = 0
+
+        Object.keys(state_data).forEach(s => {
+            state_total = 0
+            var unique_taxa = state_data[s].map(function(value,index) {
                         return value[4];
                     }).filter(function(v, i, self){
                         return i == self.indexOf(v);
                     })
-                if(uniques.length > largest_total)
-                    largest_total = uniques.length
-                state_species[s] = uniques.length
-            })
-        }
-        else if(label_type == "individuals"){
-            Object.keys(state_data).forEach(s => {
-                state_total = 0
-                state_data[s].forEach(r => {
-                        state_total += r[5]
-                })
-                if(state_total > largest_total)
-                    largest_total = state_total
-                state_species[s] = state_total
-            })
-        }
-        else if(label_type == "observers"){
-            Object.keys(state_data).forEach(s => {
-                var uniques = state_data[s].map(function(value,index) {
-                        return value[0] +"-"+value[6];
-                    }).filter(function(v, i, self){
-                        return i == self.indexOf(v);
-                    })
-                if(uniques.length > largest_total)
-                    largest_total = uniques.length
-                state_species[s] = uniques.length
-            })
+            if(unique_taxa.length > largest_unique)
+                    largest_unique = unique_taxa.length
 
-        }
+            state_data[s].forEach(r => {
+                state_total += r[5]
+            })
+            if(state_total > largest_individual)
+                largest_individual = state_total
+
+            var unique_observers = state_data[s].map(function(value,index) {
+                    return value[0] +"-"+value[6];
+                }).filter(function(v, i, self){
+                    return i == self.indexOf(v);
+                })
+            if(unique_observers.length > largest_observers)
+                largest_observers = unique_observers.length
+
+            processed_data[s] = {
+                "unique_taxa": unique_taxa,
+                "individuals": state_total,
+                "state_name": state_total,
+                "observers": unique_observers
+            }
+        })
+        country.features.forEach(state=> {
+            if(processed_data[state.properties.ST_NM] == undefined){
+                processed_data[state.properties.ST_NM] = {
+                    "unique_taxa": [],
+                    "individuals": 0,
+                    "state_name": 0,
+                    "observers": []
+                }
+            } else {
+                console.log()
+            }
+        })
+        console.log(processed_data, state_data)
+        largest_total["state_name"] = largest_individual
+        largest_total["unique_taxa"] = largest_unique
+        largest_total["individuals"] = largest_individual
+        largest_total["observers"] = largest_observers
     }
 
 
@@ -219,7 +234,7 @@
             .classed("svg-content", true)
         var projection = d3.geoMercator().scale(1400).center([85.5, 29.5])
         path = d3.geoPath().projection(projection)
-        const colors = d3.scaleLinear().domain([0, 1, largest_total]).range(["#999", "#f77", "#7f7"])
+        const colors = d3.scaleLinear().domain([0, 1, largest_total[label_type]]).range(["#ccc", "#c95", "#5e9"])
         var legend = d3.legendColor().scale(colors).shapeWidth(55).labelFormat(d3.format(".0f")).orient('horizontal').cells(6)
 
 
@@ -231,8 +246,8 @@
         base = base.selectAll("path").append("g")
 
         country.features.forEach(state=> {
-            if(state_species[state.properties.ST_NM] == undefined)
-                state_species[state.properties.ST_NM] = 0
+            if(processed_data[state.properties.ST_NM] == undefined)
+                processed_data[state.properties.ST_NM] = 0
             x = base.append("g")
                 .data([state])
                 .enter().append("path")
@@ -241,10 +256,10 @@
                 .attr("id", (d) => d.properties.ST_NM)
                 .attr("stroke-width", .5)
                 .on("click", (d) => display_data(d.properties.ST_NM))
-            if(label_type == "state_name" || label_type == "All")
-                x.attr("fill", "#aaa")
+            if (label_type == "individuals" || label_type == "state_name" || label_type == "All")
+                x.attr("fill", (d) => colors(processed_data[d.properties.ST_NM][label_type]))
             else
-                x.attr("fill", (d) => colors(state_species[d.properties.ST_NM]))
+                x.attr("fill", (d) => colors(processed_data[d.properties.ST_NM][label_type].length))
         })
         country.features.forEach(state=> {
             x = base_text.append("g")
@@ -257,8 +272,10 @@
                     .on("click", (d) => display_data(d.properties.ST_NM))
             if(label_type == "state_name")
                 x.text((d) => d.properties.ST_NM)
-            else if(label_type != "All")
-                x.text((d) => state_species[d.properties.ST_NM])
+            else if(label_type != "All" || label_type != "individuals")
+                x.text((d) => processed_data[d.properties.ST_NM].individuals)
+            else
+                x.text((d) => processed_data[d.properties.ST_NM][label_type].length)
         })
         svg.append("g")
             .attr("id", "map-legend")
@@ -308,7 +325,6 @@
             var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
                 return b.individuals - a.individuals
             })
-            console.log(cleaned[0])
 
             var unique_species = cleaned.map(function(value,index) {
                 return value.scientific_name;
