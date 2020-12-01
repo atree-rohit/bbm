@@ -163,62 +163,113 @@
         }
         calculateLabels(label_type)
         renderMap()
-        display_data("All")
+        display_data("state_name")
     }
 
     function calculateLabels(label_type){
         largest_unique = 0
         largest_individual = 0
         largest_observers = 0
+        overall_observers = []
+        overall_taxa = []
+        overall_individuals = 0
 
-        Object.keys(state_data).forEach(s => {
+        country.features.forEach(state=> {
+            state_name = state.properties.ST_NM
             state_total = 0
-            var unique_taxa = state_data[s].map(function(value,index) {
-                        return value[4];
-                    }).filter(function(v, i, self){
-                        return i == self.indexOf(v);
-                    })
-            if(unique_taxa.length > largest_unique)
-                    largest_unique = unique_taxa.length
+            state_observers = []
+            cleaned_rows = []
+            cleaned = []
 
-            state_data[s].forEach(r => {
-                state_total += r[5]
-            })
-            if(state_total > largest_individual)
-                largest_individual = state_total
-
-            var unique_observers = state_data[s].map(function(value,index) {
-                    return value[0] +"-"+value[6];
-                }).filter(function(v, i, self){
-                    return i == self.indexOf(v);
+            if(state_data[state_name] != undefined){
+                state_data[state_name].forEach(r => {
+                    if(cleaned_rows[r[4]] == undefined){
+                        cleaned_rows[r[4]] = {
+                            "scientific_name": r[4],
+                            "common_name": r[3],
+                            "individuals": parseInt(r[5]),
+                            "names": r[0] + " - " + r[6],
+                            "source": r[6]
+                        }
+                    } else {
+                        cleaned_rows[r[4]].individuals += parseInt(r[5])
+                        if(!cleaned_rows[r[4]].source.includes(r[6]))
+                            cleaned_rows[r[4]].source += ", " + r[6]
+                        if(!cleaned_rows[r[4]].names.includes(r[0] + " - " + r[6]))
+                            cleaned_rows[r[4]].names += ", " + r[0] + " - " + r[6]
+                    }
                 })
-            if(unique_observers.length > largest_observers)
-                largest_observers = unique_observers.length
+                cleaned = Object.values(cleaned_rows).sort(function(a,b) {
+                    return b.individuals - a.individuals
+                })
 
-            processed_data[s] = {
-                "unique_taxa": unique_taxa,
+                 Object.values(cleaned_rows).forEach(r => {
+                    state_total += parseInt(r.individuals)
+                    if(!state_observers.includes(r.names))
+                        state_observers.push(r.names)
+                })
+
+                if(cleaned.length > largest_unique)
+                    largest_unique = cleaned.length
+                if(state_total > largest_individual)
+                    largest_individual = state_total
+                if(state_observers.length > largest_observers)
+                    largest_observers = state_observers.length
+            }
+
+            processed_data[state_name] = {
+                "unique_taxa": cleaned.length,
                 "individuals": state_total,
                 "state_name": state_total,
-                "observers": unique_observers
+                "observers": state_observers.length,
+                "species_rows": cleaned,
+                "unique_observers": state_observers
             }
-        })
-        country.features.forEach(state=> {
-            if(processed_data[state.properties.ST_NM] == undefined){
-                processed_data[state.properties.ST_NM] = {
-                    "unique_taxa": [],
-                    "individuals": 0,
-                    "state_name": 0,
-                    "observers": []
-                }
-            } else {
-                console.log()
+        // overall_taxa = []
+        // overall_individuals = 0
+            if(overall_observers.length == 0)
+                overall_observers = state_observers
+            else {
+                state_observers.forEach(so => {
+                    if(!overall_observers.includes(so))
+                        overall_observers.push(so)
+                })
             }
+            if(overall_taxa.length == 0)
+                overall_taxa = cleaned
+            else {
+                cleaned.forEach(c => {
+                    match_flag = false
+                    overall_taxa.forEach((t,id) => {
+                        if(c.scientific_name == t.scientific_name){
+                            match_flag = true
+                            if(t.common_name.length = 0 && c.common_name.length > 0)
+                                overall_taxa[id].common_name = c.common_name
+                            overall_taxa[id].individuals += parseInt(c.individuals)
+                            if(!t.names.includes(c.name))
+                                overall_taxa[id].names += ", " + c.names
+                            if(!t.source.includes(c.source))
+                                overall_taxa[id].source += ", " + c.source
+                        }
+                    })
+
+                })
+            }
+            // console.log(overall_taxa)
         })
-        console.log(processed_data, state_data)
-        largest_total["state_name"] = largest_individual
-        largest_total["unique_taxa"] = largest_unique
-        largest_total["individuals"] = largest_individual
-        largest_total["observers"] = largest_observers
+            processed_data["All"] = {
+                "unique_taxa": cleaned.length,
+                "individuals": state_total,
+                "state_name": state_total,
+                "observers": overall_observers.length,
+                "species_rows": cleaned,
+                "unique_observers": overall_observers
+            }
+
+            largest_total["state_name"] = largest_individual
+            largest_total["unique_taxa"] = largest_unique
+            largest_total["individuals"] = largest_individual
+            largest_total["observers"] = largest_observers
     }
 
 
@@ -256,10 +307,8 @@
                 .attr("id", (d) => d.properties.ST_NM)
                 .attr("stroke-width", .5)
                 .on("click", (d) => display_data(d.properties.ST_NM))
-            if (label_type == "individuals" || label_type == "state_name" || label_type == "All")
-                x.attr("fill", (d) => colors(processed_data[d.properties.ST_NM][label_type]))
-            else
-                x.attr("fill", (d) => colors(processed_data[d.properties.ST_NM][label_type].length))
+                .attr("fill", (d) => colors(processed_data[d.properties.ST_NM][label_type]))
+
         })
         country.features.forEach(state=> {
             x = base_text.append("g")
@@ -272,10 +321,8 @@
                     .on("click", (d) => display_data(d.properties.ST_NM))
             if(label_type == "state_name")
                 x.text((d) => d.properties.ST_NM)
-            else if(label_type != "All" || label_type != "individuals")
-                x.text((d) => processed_data[d.properties.ST_NM].individuals)
             else
-                x.text((d) => processed_data[d.properties.ST_NM][label_type].length)
+                x.text((d) => processed_data[d.properties.ST_NM][label_type])
         })
         svg.append("g")
             .attr("id", "map-legend")
@@ -296,121 +343,20 @@
 
     function display_data(state){
         table = ""
-        var cleaned_rows = []
-        Object.values(document.getElementsByClassName("map-boundary")[0].children).forEach(p => {
-            if(p.id === state)
-                document.getElementById(p.id).classList.add("selected_polygon")
-            else if(document.getElementById(p.id) != null)
-                document.getElementById(p.id).classList.remove("selected_polygon")
+        observers = "";
+        console.log(state)
+        processed_data[state].unique_observers.forEach(o => {
+            if(o.includes("ibp"))
+                observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
+            else if (o.includes("inat"))
+                observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
+            else
+                observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
         })
-
-        if(state == "All"){
-            Object.values(state_data).forEach(s => {
-                s.forEach(r => {
-                    if(cleaned_rows[r[4]] == undefined){
-                        cleaned_rows[r[4]] = {
-                            "scientific_name": r[4],
-                            "common_name": r[3],
-                            "individuals": parseInt(r[5]),
-                            "names": r[0],
-                            "source": r[6]
-                        }
-                    } else {
-                        cleaned_rows[r[4]].individuals += parseInt(r[5])
-                        if(!cleaned_rows[r[4]].source.includes(r[6]))
-                            cleaned_rows[r[4]].source += ", " + r[6]
-                    }
-                })
-            })
-            var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
-                return b.individuals - a.individuals
-            })
-
-            var unique_species = cleaned.map(function(value,index) {
-                return value.scientific_name;
-            }).filter(function(v, i, self){
-                return i == self.indexOf(v);
-            })
-            var total_individuals = 0
-            cleaned.forEach(r => {
-                total_individuals += parseInt(r.individuals)
-            })
-            var unique_observers = cleaned.map(function(value,index) {
-                return value.names + "-" + value.source
-            }).filter(function(v, i, self){
-                return i == self.indexOf(v)
-            });
-            observers = "";
-            unique_observers.forEach(o => {
-                if(o.includes("ibp"))
-                    observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
-                else if (o.includes("inat"))
-                    observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
-                else
-                    observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
-            })
-        }
-        else
-        {
-
-            if(state_data[state] == undefined){
-                unique_species = ""
-                total_individuals = "0"
-                observers = "-"
-                unique_observers = ""
-                cleaned = ""
-            } else {
-                var unique_species = state_data[state].map(function(value,index) {
-                    return value[4];
-                }).filter(function(v, i, self){
-                    return i == self.indexOf(v);
-                })
-                var total_individuals = 0
-                state_data[state].forEach(r => {
-                    total_individuals += parseInt(r[5])
-                })
-                var unique_observers = state_data[state].map(function(value,index) {
-                    return value[0] + "-" + value[6]
-                }).filter(function(v, i, self){
-                    return i == self.indexOf(v)
-                });
-                observers = "";
-                unique_observers.forEach(o => {
-                    if(o.includes("ibp"))
-                        observers += '<div class="col text-nowrap border border-warning table-warning text-center rounded m-1">'+o.replace("-ibp", "")+'</div>'
-                    else if (o.includes("inat"))
-                        observers += '<div class="col text-nowrap border border-success table-success text-center rounded m-1">'+o.replace("-inat", "")+'</div>'
-                    else
-                        observers += '<div class="col text-nowrap border border-info table-info text-center rounded m-1">'+o.replace("-butterfly_counts", "")+'</div>'
-                })
-                state_data[state].forEach(r => {
-                    if(cleaned_rows[r[4]] == undefined){
-                        cleaned_rows[r[4]] = {
-                            "scientific_name": r[4],
-                            "common_name": r[3],
-                            "individuals": parseInt(r[5]),
-                            "names": r[0],
-                            "source": r[6]
-                        }
-                    } else {
-                        cleaned_rows[r[4]].individuals += parseInt(r[5])
-                        if(!cleaned_rows[r[4]].source.includes(r[6]))
-                            cleaned_rows[r[4]].source += ", " + r[6]
-                        if(!cleaned_rows[r[4]].names.includes(r.names))
-                            cleaned_rows[r[4]].names += ", " + r[0]
-                    }
-                })
-                var cleaned = Object.values(cleaned_rows).sort(function(a,b) {
-                    return b.individuals - a.individuals
-                })
-            }
-        }
-
-
-        Object.values(cleaned).forEach(p => {table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td class='text-center'>" + p.individuals + "</td><td>"+p.source+"</td></tr>"})
-        document.getElementById('data-species').innerHTML = unique_species.length
-        document.getElementById('data-individuals').innerHTML = total_individuals
-        document.getElementById('data-observers').innerHTML = unique_observers.length
+        Object.values(processed_data[state].species_rows).forEach(p => {table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td class='text-center'>" + p.individuals + "</td><td>"+p.source+"</td></tr>"})
+        document.getElementById('data-species').innerHTML = processed_data[state].unique_taxa
+        document.getElementById('data-individuals').innerHTML = processed_data[state].individuals
+        document.getElementById('data-observers').innerHTML = processed_data[state].observers
         document.getElementById('observers').innerHTML = observers
         document.getElementById('places').innerHTML = state
         document.getElementById('map-data').innerHTML = table
