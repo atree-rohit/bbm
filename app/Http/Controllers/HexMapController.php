@@ -14,7 +14,7 @@ class HexMapController extends Controller
     public function index()
     {
         ini_set('max_execution_time', 300);
-
+        /*
         $forms = CountForm::select("id", "name", "latitude", "longitude", "location as place")
             ->where("coordinates", "<>", null)
             ->where("duplicate", "false")
@@ -32,7 +32,7 @@ class HexMapController extends Controller
             ->where("createdOn", "like", "%/09/2020%")
             // ->limit(100)
             ->get();
-
+*/
         // echo "<table border='0'>";
         // echo "<thead><th>Name</th><th>Latitude</th><th>Longitude</th><th>Place</th><th>Common Name</th><th>Scientific Name</th><th>Individuals</th><th>Source</th>";
         // foreach ($forms as $f) {
