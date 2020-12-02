@@ -9,12 +9,12 @@
     <script src="{{ asset('js/states_data.js') }}"></script>
     <style>
         .selected_polygon{
-            fill: #1af;
-            stroke:#ff0;
-            stroke-width:3;
+            fill: #ffc;
         }
         .poly_text{
             z-index:100;
+            /*stroke:#222 !important;*/
+            fill: #111;
         }
         .map-boundary path:hover{
             cursor: pointer;
@@ -23,6 +23,10 @@
         }
         .map-boundary path.selected_polygon:hover{
             fill: #f55;
+        }
+        .state-table tbody tr:hover{
+            background-color: #ff9 !important;
+            cursor: pointer;
         }
         /*width*/
         ::-webkit-scrollbar {
@@ -81,8 +85,8 @@
                 <h3>Observers</h3>
                 <div id="observers" class="row"></div>
             </div>
-            <div style="max-height: 40vh;overflow-y: scroll;">
-                <table class="table table-sm table-striped">
+            <div style="max-height: 40vh;overflow-y: scroll;" class="border border-info">
+                <table class="table table-sm table-striped bg-light">
                     <thead id="data-table" class="bg-primary text-light"></thead>
                     <tbody id="map-data"></tbody>
                 </table>
@@ -170,11 +174,9 @@
         })
         document.getElementById(e).classList.remove("btn-outline-danger")
         document.getElementById(e).classList.add("btn-success")
-        renderMap()
         display_data("state_name")
     }
 
-    renderMap()
     display_data("state_name")
 
     function renderMap() {
@@ -188,7 +190,7 @@
             .classed("svg-content", true)
         var projection = d3.geoMercator().scale(1400).center([85.5, 29.5])
         path = d3.geoPath().projection(projection)
-        const colors = d3.scaleLinear().domain([0, 1, largest_total[label_type]]).range(["#ccc", "#ea9", "#9ef"])
+        const colors = d3.scaleLinear().domain([0, 1, largest_total[label_type]]).range(["#f77", "#6a8", "#7f9"])
         var legend = d3.legendColor().scale(colors).shapeWidth(55).labelFormat(d3.format(".0f")).orient('horizontal').cells(6)
 
         base = svg.append("g")
@@ -222,16 +224,19 @@
                 .data([state])
                 .enter().append("text")
                     .classed("poly_text", true)
-                    .attr("x", (d) => path.centroid(d)[0])
-                    .attr("y", (d) => path.centroid(d)[1])
+                    .attr("x", (h) => path.centroid(h)[0] )
+                    .attr("y", (h) => path.centroid(h)[1] )
                     .attr("text-anchor", "middle")
-                    .on("click", (d) => display_data(s_name))
             if(label_type == "state_name")
-                label.text(s_name)
+                label.attr("font-size",9)
+                    .text(s_name)
             else if (label_type == "unique_observers")
-                label.text(state_stats[s_name][label_type].length)
+                label.attr("font-size",12)
+                    .text(state_stats[s_name][label_type].length)
             else
-                label.text(state_stats[s_name][label_type])
+                label.attr("font-size",12)
+                    .text(state_stats[s_name][label_type])
+            label.on("click", (d) => display_data(s_name))
 
         })
 
@@ -240,8 +245,6 @@
             .call(legend)
             .append("text")
                 .classed("map_label", true)
-                .attr("x", (d) => path.centroid(d)[0])
-                .attr("y", (d) => path.centroid(d)[1])
                 .attr("dx", 5)
                 .attr("dy", -10)
                 .classed("h1", true)
@@ -259,6 +262,7 @@
     }
 
     function display_data(state){
+        renderMap()
         table = ""
         observers = ""
         Object.values(document.getElementsByClassName("map-boundary")[0].children).forEach(p => {
@@ -268,7 +272,7 @@
                 document.getElementById(p.id).classList.remove("selected_polygon")
         })
         if(state == "state_name"){
-            heading_name = "State Wise Summary"
+            heading_name = "States Summary"
             table_header = "<tr><th>State Name</th><th>Unique Taxa</th><th>Individuals</th><th>Observers</th><th>Sources</th></tr>"
 
             sorted_states = Object.keys(state_stats).sort().forEach(s => {
@@ -282,11 +286,15 @@
                         })
                             
                     })
-                    table += "<tr><td>" + s + "</td><td>" + d.unique_taxa + "</td><td>" + d.individuals + "</td><td>" + d.unique_observers.length + "</td><td>" + sources.join(", ") + "</td></tr>"                    
+                    select_fn = "onclick='display_data(" + '"'+s+'"'+")'"
+                    table += "<tr "+select_fn+"><td>" + s + "</td><td>" + d.unique_taxa + "</td><td>" + d.individuals + "</td><td>" + d.unique_observers.length + "</td><td>" + sources.join(", ") + "</td></tr>"                    
                 }
             })
+            document.getElementById('data-table').parentElement.classList.add("state-table")
         } else {
-            heading_name = state
+            document.getElementById('data-table').parentElement.classList.remove("state-table")
+            back_btn = "onclick='display_data(" + '"state_name"'+")'"
+            heading_name = "<button class='btn btn-sm btn-outline-primary mr-5' "+back_btn+" >Back to States Summary</button>" + state
             table_header = "<tr><th>Common Name</th><th>Scientific Name</th><th>Individuals</th><th>Source</th></tr>"
             Object.values(state_stats[state].species_rows).forEach(p => {table += "<tr><td>" + p.common_name + "</td><td>" + p.scientific_name + "</td><td class='text-center'>" + p.individuals + "</td><td>"+p.source+"</td></tr>"})
         }
@@ -306,6 +314,8 @@
         document.getElementById('data-table').innerHTML = table_header
         document.getElementById('map-data').innerHTML = table
     }
+
+    // querySelectorAll
 
 </script>
 </body>
