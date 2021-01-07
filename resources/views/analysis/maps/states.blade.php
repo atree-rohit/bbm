@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title>Big Butterfly Month - DATA</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.9.2/d3.min.js" integrity="sha512-U3BExhsSSzrscvztemnZwpCsZfbKnEFXOIezIrAi3y7sjiALdlRQsknCyp/KBKnaJZxjQXvLBT4UPkyq06BnJA==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
@@ -47,14 +47,21 @@
         ::-webkit-scrollbar-thumb:hover {
           background: #555;
         }
+        .card{
+            font-size: 1.25em !important;
+        }
+        .map_label{
+            background-color: white;
+        }
     </style>
 </head>
 <body>
     <div class="table-secondary m-1 p-2 row">
+            <div class="col-lg-6 m-0 mr-5 p-0">
+                <div id="map-container" class="svg-container table-primary"></div>
+            </div>
 
-        <div id="map-container" class="svg-container bg-light col-xl-6"></div>
-
-        <div class="col-xl-6 table-info" style="max-height: 95vh;overflow-y: none;">
+        <div class="col table-info" style="max-height: 95vh;overflow-y: none">
             <div id="map_controls" class="border border-success table-success text-center">
                 <span class="h3 p-4">Labels</span>
                 <div class="btn-group mb-2" id="btn_gp">
@@ -62,22 +69,22 @@
                 <div id="places" class="h1 d-block"></div>
             </div>
             <div class="d-flex justify-content-around my-2 text-light text-center">
-                <div class="card bg-info">
+                <div class="acard bg-info">
                     <div class="card-body">
-                        <h1 class="card-title" id="data-species">-</h1>
-                        <h3 class="card-subtitle mb-2">Unique Taxa</h3>
+                        <div id="data-species">-</div>
+                        <div>Unique Taxa</div>
                     </div>
                 </div>
-                <div class="card bg-info">
+                <div class="acard bg-info">
                     <div class="card-body">
-                        <h1 class="card-title" id="data-individuals">-</h1>
-                        <h3 class="card-subtitle mb-2">Individuals</h3>
+                        <div id="data-individuals">-</div>
+                        <div>Individuals</div>
                     </div>
                 </div>
-                <div class="card bg-info">
+                <div class="acard bg-info">
                     <div class="card-body">
-                        <h1 class="card-title" id="data-observers">-</h1>
-                        <h3 class="card-subtitle mb-2">Observers</h3>
+                        <div id="data-observers">-</div>
+                        <div>Observers</div>
                     </div>
                 </div>
             </div>
@@ -95,12 +102,19 @@
     </div>
 <script>
 
-    var svgWidth = window.innerWidth / 2
-    if(window.innerWidth < 1140){
-        alert(window.innerWidth)
-        svgWidth = window.innerWidth - 50
+    var svgWidth = (window.innerWidth / 2) - 50
+    var svgHeight = window.innerHeight
+    var legendX = svgWidth/2
+    var orientation = 0
+    if(svgWidth < svgHeight){
+        legendX = svgWidth
+        svgWidth = window.innerWidth - 100
+        svgHeight = svgWidth
+
     }
-    const svgHeight = window.innerHeight - 30
+        // alert(svgWidth +"x"+ svgHeight)
+        // alert(legendX)
+
     var svg = 0
     var path = 0
 
@@ -146,7 +160,7 @@
         })
         largest_total["state_name"] = largest_total["individuals"]
     })
-    
+
 
 
     Object.keys(label_button).forEach(k=>{
@@ -201,7 +215,7 @@
 
         country.features.forEach(state=> {
             var s_name = state.properties.st_nm
-            
+
             shape = base.append("g")
                 .data([state])
                 .enter().append("path")
@@ -241,12 +255,12 @@
         })
 
         svg.append("g")
-            .attr("transform", "translate("+svgWidth*.575+", 50)")
+            .classed("map_label", true)
+            .attr("transform", "translate("+legendX+", 50)")
             .call(legend)
             .append("text")
-                .classed("map_label", true)
-                .attr("dx", 5)
-                .attr("dy", -10)
+                .attr("dx", 15)
+                .attr("dy", -5)
                 .classed("h1", true)
                 .text(label_type.replace(/(?:_| |\b)(\w)/g, function($1){return $1.toUpperCase().replace('_',' ');}))
 
@@ -284,10 +298,10 @@
                             if(!sources.includes(cs))
                                 sources.push(cs)
                         })
-                            
+
                     })
                     select_fn = "onclick='display_data(" + '"'+s+'"'+")'"
-                    table += "<tr "+select_fn+"><td>" + s + "</td><td>" + d.unique_taxa + "</td><td>" + d.individuals + "</td><td>" + d.unique_observers.length + "</td><td>" + sources.join(", ") + "</td></tr>"                    
+                    table += "<tr "+select_fn+"><td>" + s + "</td><td>" + d.unique_taxa + "</td><td>" + d.individuals + "</td><td>" + d.unique_observers.length + "</td><td>" + sources.join(", ") + "</td></tr>"
                 }
             })
             document.getElementById('data-table').parentElement.classList.add("state-table")
