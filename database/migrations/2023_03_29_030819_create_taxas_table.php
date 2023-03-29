@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('taxas', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
+            $table->string('common_name')->nullable();
+            $table->string('rank')->nullable();
+            $table->text('ancestry')->nullable();
             $table->timestamps();
         });
     }

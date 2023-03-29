@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('user_name')->nullable();
+            $table->string('user_login')->nullable();
+            $table->enum('source', ["count", "inat", "ibp", "ifb", null])->nullable();
             $table->timestamps();
         });
     }
