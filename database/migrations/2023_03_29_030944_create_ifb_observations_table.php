@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('media_code')->nullable();
             $table->string('species_name')->nullable();
             $table->string('rank')->nullable();
-            $table->string('user')->nullable();
+            $table->string('user_name')->nullable();
             $table->string('life_stage')->nullable();
             $table->string('country')->nullable();
             $table->string('state')->nullable();
