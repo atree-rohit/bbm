@@ -1,0 +1,15 @@
+Home page: The home page should include an overview of the Big Butterfly Month project, its objectives, and its significance. You can also include a call-to-action button for users to download the PWA and start recording butterfly sightings.
+
+Submit a butterfly list: This section should allow users to submit their butterfly lists. You can provide a form that asks for the location, date and time of the butterfly count, and a list of species observed. Users can also upload photos if they wish.
+
+Dashboard: This section should display the progress of the project for the current year, including the number of butterfly sightings, the number of species observed, and the top contributors. You can also include a leaderboard that ranks the top contributors.
+
+Data visualization: This section should include an interactive data visualization that displays the data from the previous three years. Users should be able to filter the data by location, species, and time of year.
+
+About: This section should provide information about the project, including its history, objectives, and team members.
+
+Spotlights:  the stories and experiences of individual contributors, organizations, events, and locations that have made a significant impact on the Big Butterfly Month project. Read their inspiring stories and learn how you can get involved too.
+
+Partners: This section should list the partner organizations that are involved in the Big Butterfly Month project.
+
+Resources: This section can include educational resources, such as identification guides and tips for observing and documenting butterflies.
