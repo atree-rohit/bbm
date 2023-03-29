@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('no_of_individuals_cleaned')->default(0);
             $table->string('remarks')->nullable();
             $table->string('id_quality')->nullable();
-            $table->boolean('flag')->default(false);
+            $table->boolean('flag')->default(false)->nullable();
             $table->text('flag_notes')->nullable();
             $table->timestamps();
 

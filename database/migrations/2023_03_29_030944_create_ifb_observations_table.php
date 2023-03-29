@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('ifb_observations', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("boi_id");
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('taxa_id')->nullable();
             $table->string('created_date')->nullable();

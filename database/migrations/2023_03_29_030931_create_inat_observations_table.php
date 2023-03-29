@@ -17,6 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('taxa_id')->nullable();
             $table->string('observed_on')->nullable();
             $table->string('location')->nullable();
+            $table->float('latitude', 8, 6)->nullable();
+            $table->float('longitude', 8, 6)->nullable();
             $table->string('place_guess')->nullable();
             $table->string('state')->nullable();
             $table->string('district')->nullable();
