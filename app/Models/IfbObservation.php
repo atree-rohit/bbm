@@ -12,4 +12,10 @@ class IfbObservation extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function taxa()
+    {
+        return $this->belongsTo(Taxa::class);
+    }
+
 }

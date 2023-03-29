@@ -12,4 +12,9 @@ class CountForm extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+
+    public function rows()
+    {
+        return $this->hasMany(FormRow::class);
+    }
 }
