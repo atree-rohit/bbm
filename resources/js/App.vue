@@ -1,6 +1,10 @@
 
 <template>
-    <species-page />
+    <!-- <species-page /> -->
+    Stats
+    <pre>
+        {{ sizes }}
+    </pre>
 </template>
 
 <script lang="ts">
@@ -22,6 +26,13 @@ export default defineComponent({
             'users',
             'observations'
         ]),
+        sizes(){
+            return {
+                taxa: JSON.stringify(this.taxa).length,
+                users: JSON.stringify(this.users).length,
+                observations: JSON.stringify(this.observations).length
+            }
+        }
     }
 
 })
