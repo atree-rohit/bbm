@@ -27,6 +27,7 @@ return new class extends Migration
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
             $table->string('date')->nullable();
+            $table->string('date_cleaned')->nullable();
             $table->string('start_time')->nullable();
             $table->string('end_time')->nullable();
             $table->string('altitude')->nullable();
