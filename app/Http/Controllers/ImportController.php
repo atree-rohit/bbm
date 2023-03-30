@@ -81,6 +81,7 @@ class ImportController extends Controller
                 $count->latitude = $form->latitude;
                 $count->longitude = $form->longitude;
                 $count->date = $form->date;
+                $count->date_cleaned = $form->date_cleaned;
                 $count->start_time = $form->start_time;
                 $count->end_time = $form->end_time;
                 $count->altitude = $form->altitude;
@@ -172,6 +173,7 @@ class ImportController extends Controller
         $existing_taxa = Taxa::pluck('id')->toArray();
         $ibp_data = json_decode(file_get_contents(public_path('/data/ibp.json')));
         $count = 0;
+        //check if dates are within range
         foreach($ibp_data as $i){
             if(!in_array($i->id, $existing_ibp)){
                 $user_id = $this->create_or_get_user_id("ibp", null, $i->createdBy);
@@ -213,6 +215,7 @@ class ImportController extends Controller
         $existing_taxa = Taxa::pluck('id')->toArray();
         $ifb_data = json_decode(file_get_contents(public_path('/data/ifb.json')));
         $count = 0;
+        //check if dates are within range
         foreach($ifb_data as $i){
             if(!in_array($i->id, $existing_ifb)){
                 $user_id = $this->create_or_get_user_id("ifb", $i->user);
