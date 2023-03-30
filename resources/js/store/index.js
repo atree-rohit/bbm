@@ -23,15 +23,17 @@ export default createStore({
             axois.get('/api/taxa')
                 .then(response => {
                     commit('SET_TAXA', response.data)
+                    console.info("Taxa set")
                 })
             axois.get('/api/users')
                 .then(response => {
                     commit('SET_USERS', response.data)
+                    console.info("Users set")
                 })
             axois.get('/api/observations')
                 .then(response => {
-                    console.log(response)
                     commit('SET_OBSERVATIONS', response.data)
+                    console.info("Observations set")
                 })
         },
     },
