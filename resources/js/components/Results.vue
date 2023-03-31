@@ -1,6 +1,6 @@
 <style scoped>
     .flex-wrapper{
-        height: 95vh;
+        height: 100%;
         display:flex;
         gap: 0.5rem;
         flex-direction: column;

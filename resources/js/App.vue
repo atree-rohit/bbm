@@ -6,17 +6,22 @@
     .fade-enter, .fade-leave-to {
         opacity: 0;
     }
+    main{
+        position: relative;
+        top: 3.7rem;
+        height: calc(100vh - 4rem);
+        border: 1px solid yellowgreen;
+    }
 
     main > div{
         border: 1px solid red;
-        position: absolute;
-        top: 4rem;
         width: 100%;
-        padding: 1rem;
     }
     @media screen and (min-width: 800px) {
-        main > div{
-            top: 4.75rem;
+        main{
+            width: 100%;
+            top: 4.05rem;
+            height: calc(100vh - 4.75rem);
         }
     }
 </style>
@@ -76,12 +81,19 @@ export default defineComponent({
     },
     methods:{
         set_page(){
-            let page = window.location.hash.slice(1)
-            if(page == ""){
+            let page = this.capitalizeWords(window.location.pathname.replace("/", "").replace("_", " "))
+            if(page == "" || page == "/"){
                 page = "Home"
+            } else if (page == "Faq"){
+                page = "FAQ"
             }
             store.dispatch("gotoPage", page)
-        }
+        },
+        capitalizeWords(str) {
+            return str.toLowerCase().replace(/\b\w/g, function(l) {
+                return l.toUpperCase();
+            });
+        },
     }
 })
 </script>
