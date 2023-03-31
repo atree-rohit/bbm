@@ -14,14 +14,14 @@ class ApiController extends Controller
 {
     public function get_taxa()
     {
-        $data = Taxa::all();
+        $data = Taxa::select("id", "name", "common_name", "rank", "ancestry")->get();
         $compressed_data = $this->compress_data($data);
         return response($compressed_data)->header('Content-Encoding', 'gzip');
     }
 
     public function get_users()
     {
-        $data = User::all();
+        $data = User::select("id", "name", "source")->get();
         $compressed_data = $this->compress_data($data);
         return response($compressed_data)->header('Content-Encoding', 'gzip');
     }

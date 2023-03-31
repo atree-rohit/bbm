@@ -1,13 +1,15 @@
 :root{
-    --border-radius: 1.5rem;
+    --border-radius: 1.0rem;
     --clr-bg-black: #212121;
     --clr-bg-blue: #00447c;
     --clr-bg-light-blue: #0b7b9e;
+    --clr-bg-green: #359c3a;
     --clr-bg-grey: #dddace;
     --clr-bg-white: #f2f3f4;
     --clr-text-black: #0c0c0c;
     --clr-text-blue: #002756;
     --clr-text-light-blue: #035b7a;
+    --clr-text-green: #076604;
     --clr-text-grey: #c6c3b6;
     --clr-text-white: #eaeaea;
 

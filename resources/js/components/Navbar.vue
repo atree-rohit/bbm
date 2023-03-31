@@ -6,6 +6,7 @@
         width: 100%;
         z-index: 100;
         padding: 0.5rem .25rem;
+        min-height: 4rem;
     }
     .logo{
         color: var(--clr-text-white);
