@@ -160,13 +160,12 @@
             content: "";
             display: block;
             height: .1rem;
-            background: var(--clr-text-white);
+            background: var(--clr-bg-light-blue);
             border-radius: 5rem;
             position: absolute;
             left: 0;
             right: 0;
             transform: scale(0, 0);
-            
             transition: transform ease-in-out 500ms;
         }
 
