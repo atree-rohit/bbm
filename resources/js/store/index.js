@@ -3,6 +3,8 @@ import axois from 'axios'
 
 export default createStore({
     state:{
+        pages: ["Home", "About", "FAQ", "Videos", "Past Results", "Partners"],
+        selected_page: "Home",
         taxa: [],
         users: [],
         observations: {},
@@ -17,6 +19,9 @@ export default createStore({
         SET_OBSERVATIONS(state, payload){
             state.observations = payload
         },
+        SET_SELECTED_PAGE(state, payload){
+            state.selected_page = payload
+        }
     },
     actions:{
         getAllData({commit}){
@@ -36,6 +41,9 @@ export default createStore({
                     console.info("Observations set")
                 })
         },
+        gotoPage({commit}, payload){
+            commit('SET_SELECTED_PAGE', payload)
+        }
     },
     getters:{
     }
