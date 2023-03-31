@@ -6,7 +6,7 @@
         flex-direction: column;
         background: rgba(255, 0, 255, 0.25);
         padding: 0.5rem;
-        padding-top:3.75rem;
+        /* padding-top:3.75rem; */
     }
 
     .flex-wrapper .filters-wrapper,
