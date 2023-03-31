@@ -16,6 +16,13 @@ use App\Http\Controllers\ImportController;
 */
 
 Route::get('/', [HomeController::class, 'home']);
+Route::get('/home', [HomeController::class, 'home']);
+Route::get('/about', [HomeController::class, 'home']);
+Route::get('/faq', [HomeController::class, 'home']);
+Route::get('/videos', [HomeController::class, 'home']);
+Route::get('/past_results', [HomeController::class, 'home']);
+Route::get('/results', [HomeController::class, 'home']);
+Route::get('/partners', [HomeController::class, 'home']);
 
 
 Route::get('/import_data', [ImportController::class, 'import']);
