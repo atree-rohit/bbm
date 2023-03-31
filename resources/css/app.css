@@ -1,15 +1,32 @@
 :root{
-    --border-radius: 1rem;
+    --border-radius: 1.5rem;
+    --clr-bg-black: #212121;
+    --clr-bg-blue: #00447c;
+    --clr-bg-light-blue: #0b7b9e;
+    --clr-bg-grey: #dddace;
+    --clr-bg-white: #f2f3f4;
+    --clr-text-black: #0c0c0c;
+    --clr-text-blue: #002756;
+    --clr-text-light-blue: #035b7a;
+    --clr-text-grey: #c6c3b6;
+    --clr-text-white: #eaeaea;
+
 }
-*{
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
-html, body {
+
+html,
+body {
+    font-family: 'Work Sans', sans-serif;
     height: 100%;
     width:100%;
-    overflow-y:hidden;
-    font-family: 'Gill sans', 'Gill sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    /* overflow-y:hidden; */
 }
 
 .carousel-btns{
@@ -21,6 +38,7 @@ html, body {
     transition: all 500ms;
     background: transparent;
 }
+
 .carousel-btns:hover{
     padding: 0 1rem;
     background: rgb(20,0,50);
