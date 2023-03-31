@@ -8,6 +8,13 @@ export default createStore({
         taxa: [],
         users: [],
         observations: {},
+        selected: {
+            source: null,
+            taxa: null,
+            location: null,
+            date: null,
+            user: null,
+        }
     },
     mutations:{
         SET_TAXA(state, payload){
