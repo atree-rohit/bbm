@@ -9,6 +9,7 @@
     }
     .logo{
         color: var(--clr-text-white);
+        transform: scale(1.5);
     }
     .logo img{
         /* position: relative; */
@@ -100,7 +101,7 @@
         margin-bottom: 1rem;
         margin-left: 1rem;
     }
-    nav ul li a{
+    nav ul li span{
         color: var(--clr-text-grey);
         text-decoration: none;
         font-size: 1.2rem;
@@ -108,17 +109,44 @@
         opacity: 0;
         transition: opacity 50ms ease-in-out;
     }
-    nav ul li a:hover{
+    nav ul li span:hover{
+        cursor: pointer;
         color: var(--clr-bg-light-blue);
+    }
+    nav ul li.active span {
+        color: goldenrod;
     }
 
     .nav-toggle:checked ~ nav{
         transform: scale(1, 1);
     }
 
-    .nav-toggle:checked ~ nav ul li a {
+    .nav-toggle:checked ~ nav ul li span{
         opacity: 1;
         transition-delay: 250ms;
+    }
+
+    nav ul li.active span{
+        position:relative;
+    }
+
+    nav ul li.active span::before,
+    nav ul li.active span::after{
+        content: "";
+        position: absolute;
+        top: -.25rem;
+        width: 2px;
+        height: 125%;
+        background: var(--clr-bg-light-blue);
+        border-radius: 0.5rem;
+    }
+
+    nav ul li.active span::before{
+        left: -0.5rem;
+    }
+
+    nav ul li.active span::after{
+        right: -.5rem;
     }
 
     @media screen and (min-width: 800px) {
@@ -132,7 +160,13 @@
         }
         .logo{
             grid-column: 2 / span 1;
-            transform: scale(1.5);
+            display: flex;
+            justify-content: baseline;
+            transform: scale(1.65);
+            border: 4px solid var(--clr-bg-blue);
+            border-radius: .5rem;
+            border-top: 0.4rem solid transparent;
+            border-bottom-width: 4px;
         }
         nav{
             all: unset;
@@ -149,14 +183,14 @@
             margin-left: 1.75rem;
             margin-bottom: 0;
         }
-        nav ul li a{
+        nav ul li span{
             opacity: 1;
             position: relative;
             transition: all 1s;
         }
 
-        nav ul li a::before, 
-        nav ul li a::after{
+        nav ul li span::before, 
+        nav ul li span::after{
             content: "";
             display: block;
             height: .1rem;
@@ -169,16 +203,16 @@
             transition: transform ease-in-out 500ms;
         }
 
-        nav ul li a::before{
+        nav ul li span::before{
             top: -.75rem;
             transform-origin: right;
         }
-        nav ul li a::after{
+        nav ul li span::after{
             bottom: -.75rem;
             transform-origin: left;
         }
-        nav ul li a:hover::before, 
-        nav ul li a:hover::after{
+        nav ul li span:hover::before, 
+        nav ul li span:hover::after{
             transform: scale(1, 1);
         }
     }
@@ -189,11 +223,16 @@
         <div class="logo">
             <img src="/img/bbm_23_logo.jpg" alt="">
         </div>
-        <input type="checkbox" id="nav-toggle" class="nav-toggle">
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" v-model="nav_toggle">
         <nav>
             <ul>
-                <li v-for="page in pages" :key="page">
-                    <a href="#">{{ page }}</a>
+                <li
+                    v-for="page in pages"
+                    :key="page"
+                    :class="{ 'active': page === selected_page }"
+                    @click.stop="selectPage(page)"
+                >
+                    <span>{{ page }}</span>
                 </li>
             </ul>
         </nav>
@@ -206,22 +245,31 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
-import store from './store/index.js'
+import store from '../store/index.js'
 
 export default defineComponent({
     name: "Navbar",
     data(){
         return {
-            pages: ["Home", "About", "FAQ", "Videos", "Past Results", "Partners"],
-            selectedPage: "Home"
+            nav_toggle: false
         }
     },
-    methods: {
-    },
     computed: {
-        ...mapState({
-            species: state => state.species
-        })
-    }
+        ...mapState(["pages", "selected_page"])
+    },
+    methods: {
+        selectPage(page){
+            store.dispatch("gotoPage", page)
+            history.pushState(
+                null,
+                null,
+                this.URLSlug(page)
+            )
+            this.nav_toggle = false
+        },
+        URLSlug(page){
+            return page.toLowerCase().replace(" ", "_")
+        }
+    },
 })
 </script>
