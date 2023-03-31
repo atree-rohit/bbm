@@ -3,7 +3,9 @@
 </style>
 
 <template>
-    <div>Partners</div>
+    <div>
+        <div class="title">Partners</div>
+    </div>
 </template>
 
 <script lang="ts">

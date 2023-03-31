@@ -6,9 +6,7 @@
     .fade-enter, .fade-leave-to {
         opacity: 0;
     }
-    main{
-        /* padding-top: 4rem; */
-    }
+
     main > div{
         border: 1px solid red;
         position: absolute;

@@ -3,7 +3,9 @@
 </style>
 
 <template>
-    <div>FAQ</div>
+    <div>
+        <div class="title">FAQ</div>
+    </div>
 </template>
 
 <script lang="ts">

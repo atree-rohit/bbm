@@ -28,7 +28,11 @@ body {
     width:100%;
     /* overflow-y:hidden; */
 }
-
+.title{
+    display: flex;
+    justify-content: center;
+    font-size:2rem;
+}
 .carousel-btns{
     font-size:5rem;
     color:rgba(255,255,255,0);
