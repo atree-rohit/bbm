@@ -218,7 +218,7 @@ class ImportController extends Controller
         //check if dates are within range
         foreach($ifb_data as $i){
             if(!in_array($i->id, $existing_ifb)){
-                $user_id = $this->create_or_get_user_id("ifb", $i->user);
+                $user_id = $this->create_or_get_user_id("ifb", null,$i->user);
                 $taxa_id = null;
                 if(in_array($i->inat_taxa_id, $existing_taxa)){
                     $taxa_id = $i->inat_taxa_id;
