@@ -130,7 +130,7 @@
                 class="chip"
                 v-for="taxon in filtered_taxa"
                 :key="taxon.id"
-                :class="{ selected: selected_taxa.indexOf(taxon) > -1 }"
+                :class="{ selected: selected.taxa.indexOf(taxon.id) > -1 }"
                 @click="selectTaxa(taxon)"
                 :title="taxon.rank"
             >
@@ -144,6 +144,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { mapState } from 'vuex'
+import store from '../store'
 export default defineComponent({
     name: "SelectSpecies",
     data(){
@@ -151,12 +152,12 @@ export default defineComponent({
             ranks: [ "order", "superfamily", "family", "subfamily", "tribe", "genus", "species" ],
             selected_ranks: [ "order", "superfamily", "family", "subfamily", "tribe", "genus", "species" ],
             search_string: '',
-            selected_taxa: [],
         }
     },
     computed: {
         ...mapState([
-            "taxa"
+            "taxa",
+            "selected"
         ]),
         cleaned_taxa(){
             return this.taxa.filter(taxon => {
@@ -192,12 +193,7 @@ export default defineComponent({
             }
         },
         selectTaxa(taxon){
-            const index = this.selected_taxa.indexOf(taxon)
-            if(index > -1){
-                this.selected_taxa.splice(index, 1)
-            } else {
-                this.selected_taxa.push(taxon)
-            }
+            store.dispatch("selectTaxa", taxon.id)
         },
     }    
 })

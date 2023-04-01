@@ -10,7 +10,7 @@ export default createStore({
         observations: {},
         selected: {
             source: null,
-            taxa: null,
+            taxa: [],
             location: null,
             date: null,
             user: null,
@@ -28,6 +28,14 @@ export default createStore({
         },
         SET_SELECTED_PAGE(state, payload){
             state.selected_page = payload
+        },
+        SET_SELECTED_TAXA(state, taxon){
+            const index = state.selected.taxa.indexOf(taxon)
+            if(index > -1){
+                state.selected.taxa.splice(index, 1)
+            } else {
+                state.selected.taxa.push(taxon)
+            }
         }
     },
     actions:{
@@ -50,6 +58,9 @@ export default createStore({
         },
         gotoPage({commit}, payload){
             commit('SET_SELECTED_PAGE', payload)
+        },
+        selectTaxa({commit}, payload){
+            commit('SET_SELECTED_TAXA', payload)
         }
     },
     getters:{

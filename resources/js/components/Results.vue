@@ -55,6 +55,11 @@
         grid-template-rows: 0rem 7.5rem auto;
     }
 
+    .filters-wrapper > div.selected-filter,
+    .modes-wrapper > div.selected-mode{
+        background: var(--clr-bg-light-blue);
+    }
+
     .filters-wrapper > div:not(.selected-filter),
     .modes-wrapper > div:not(.selected-mode){
         flex: 1 3 0;
@@ -96,21 +101,28 @@
         </div>
         <div
             class="data-wrapper"
-            :class="{'selected-mode': selected.mode, 'selected-filter': selected.filter}"
+            :class="{'selected-mode': selected_tab.mode, 'selected-filter': selected_tab.filter}"
         > 
             <div class="filters">
-				<SelectSpecies v-if="selected.filter == 'species'"/>
-				<span v-else>{{ capatilizeWord(selected.filter) }}</span>
+				<SelectSpecies v-if="selected_tab.filter == 'species'"/>
+				<span v-else>{{ capatilizeWord(selected_tab.filter) }}</span>
 			</div>
-            <div class="modes">{{ capatilizeWord(selected.mode) }}</div>
-            <div class="data">Data</div>
+            <div class="modes">{{ capatilizeWord(selected_tab.mode) }}</div>
+            <div class="data">
+                Data
+                <pre>
+                    {{ selected }}
+                </pre>
+            </div>
         </div>
       </div>
   </template>
   
   <script>
   import { defineComponent } from 'vue'
-  import SelectSpecies from "./SelectSpecies.vue";
+  import { mapState } from "vuex"
+  import SelectSpecies from "./SelectSpecies.vue"
+
   export default defineComponent({
 	name: "Results",
 	components: {
@@ -118,15 +130,18 @@
 	},
     data() {
 		return {
-			filters: ["species", "location",  "date", "user"],
+			filters: ["portal", "species", "location",  "date", "user"],
 			modes: ["table", "map", "chart"],
-			selected: {
-			filter: null,
-			mode: null
+			selected_tab: {
+                filter: null,
+                mode: null
 			},
 			selectedFilter: null,
 			selectedMode: null,
 		};
+    },
+    computed: {
+        ...mapState(["selected"])
     },
     methods: {
 		capatilizeWord(str){
@@ -137,25 +152,25 @@
 		},
 		filterClass(filter){
 			let op = filter
-			if(this.selected.filter == filter){
+			if(this.selected_tab.filter == filter){
 				op += " selected-filter"
 			} 
 			return op
 		},
 		modeClass(filter){
 			let op = filter
-			if(this.selected.mode == filter){
+			if(this.selected_tab.mode == filter){
 				op += " selected-mode"
 			} 
 			return op
 		},
 		select(val, type){
 			if(type == "filter"){
-				this.selected.mode = null
-				this.selected.filter = (this.selected.filter == val) ? null : val
+				this.selected_tab.mode = null
+				this.selected_tab.filter = (this.selected_tab.filter == val) ? null : val
 			} else if(type == "mode"){
-				this.selected.filter = null
-				this.selected.mode = (this.selected.mode == val) ? null : val
+				this.selected_tab.filter = null
+				this.selected_tab.mode = (this.selected_tab.mode == val) ? null : val
 			}
 		}
     }
