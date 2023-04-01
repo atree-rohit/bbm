@@ -4,7 +4,7 @@
         border-radius: var(--border-radius);
         padding: .5rem;
         display: grid;
-        grid-template-columns: 1fr 1fr 5fr;
+        grid-template-columns: 1fr 5fr;
         justify-content: space-between;
         align-items: stretch;
     }
@@ -16,10 +16,16 @@
         gap: .125rem;
     }
     
-    .species-select-wrapper .ranks,
-    .species-select-wrapper .search,
+    .species-select-wrapper .filters,
     .species-select-wrapper .list{
         border: 1px solid var(--clr-bg-grey);
+        height: 100%;
+    }
+
+    .species-select-wrapper .filters > div{
+        flex: 1 1 0;
+        display:flex;
+        align-items: center;
     }
 
     .species-select-wrapper .search{
@@ -110,20 +116,21 @@
 
 <template>
     <div class="species-select-wrapper">
-        <div class="ranks">
-            <button
-                class="btn"
-                v-for="rank in ranks"
-                :key="rank"
-                :class="rankClass(rank)"
-                @click="selectRank(rank)"
-                v-text="rank"
-            />
-                
-        </div>
-        <div class="search">
-            {{ search_string }}
-            <input type="text" v-model="search_string">
+        <div class="filters">
+            <div class="ranks">
+                <button
+                    class="btn"
+                    v-for="rank in ranks"
+                    :key="rank"
+                    :class="rankClass(rank)"
+                    @click="selectRank(rank)"
+                    v-text="rank"
+                />
+                    
+            </div>
+            <div class="search">
+                <input type="text" v-model="search_string">
+            </div>
         </div>
         <div class="list" >
             <div

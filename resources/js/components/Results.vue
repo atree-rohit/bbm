@@ -105,6 +105,8 @@
         > 
             <div class="filters">
 				<SelectSpecies v-if="selected_tab.filter == 'species'"/>
+				<SelectUser v-else-if="selected_tab.filter == 'user'"/>
+				<SelectPortal v-else-if="selected_tab.filter == 'portal'"/>
 				<span v-else>{{ capatilizeWord(selected_tab.filter) }}</span>
 			</div>
             <div class="modes">{{ capatilizeWord(selected_tab.mode) }}</div>
@@ -122,15 +124,19 @@
   import { defineComponent } from 'vue'
   import { mapState } from "vuex"
   import SelectSpecies from "./SelectSpecies.vue"
+  import SelectUser from "./SelectUser.vue"
+  import SelectPortal from "./SelectPortal.vue"
 
   export default defineComponent({
 	name: "Results",
 	components: {
-		SelectSpecies
+        SelectSpecies,
+		SelectUser,
+		SelectPortal,
 	},
     data() {
 		return {
-			filters: ["portal", "species", "location",  "date", "user"],
+			filters: [ "species", "location",  "date", "user", "portal", ],
 			modes: ["table", "map", "chart"],
 			selected_tab: {
                 filter: null,

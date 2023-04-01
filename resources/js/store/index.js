@@ -9,11 +9,11 @@ export default createStore({
         users: [],
         observations: {},
         selected: {
-            source: null,
+            portals:["count", "inat", "ibp", "ifb"],
             taxa: [],
             location: null,
             date: null,
-            user: null,
+            users: [],
         }
     },
     mutations:{
@@ -35,6 +35,22 @@ export default createStore({
                 state.selected.taxa.splice(index, 1)
             } else {
                 state.selected.taxa.push(taxon)
+            }
+        },
+        SET_SELECTED_PORTAL(state, portal){
+            const index = state.selected.portals.indexOf(portal)
+            if(index > -1){
+                state.selected.portals.splice(index, 1)
+            } else {
+                state.selected.portals.push(portal)
+            }
+        },
+        SET_SELECTED_USER(state, user){
+            const index = state.selected.users.indexOf(user)
+            if(index > -1){
+                state.selected.users.splice(index, 1)
+            } else {
+                state.selected.users.push(user)
             }
         }
     },
@@ -61,6 +77,12 @@ export default createStore({
         },
         selectTaxa({commit}, payload){
             commit('SET_SELECTED_TAXA', payload)
+        },
+        selectUser({commit}, payload){
+            commit('SET_SELECTED_USER', payload)
+        },
+        selectPortal({commit}, payload){
+            commit('SET_SELECTED_PORTAL', payload)
         }
     },
     getters:{
