@@ -1,21 +1,22 @@
 <style scoped>
-    .flex-wrapper{
+    .main-wrapper{
         height: 100%;
-        display:flex;
-        gap: 0.5rem;
-        flex-direction: column;
+        display:grid;
+        grid-gap: 0.5rem;
+        grid-template-rows: 2rem 2rem auto;
+        height: 90vh;
         padding: 0.5rem;
     }
 
-    .flex-wrapper .filters-wrapper,
-    .flex-wrapper .modes-wrapper{
+    .filters-wrapper,
+    .modes-wrapper{
         display:flex;
         border-radius: 1rem;
         overflow: hidden;
     }
 
-    .flex-wrapper .filters-wrapper > div, 
-    .flex-wrapper .modes-wrapper > div{
+    .filters-wrapper > div, 
+    .modes-wrapper > div{
         flex: 1 1 0;
         box-shadow: .25rem .25rem 0.5rem #bbb;
         transition: all 250ms ease;
@@ -28,68 +29,53 @@
     }
 
 
-    .flex-wrapper .data-wrapper{
-        flex: 2 1 0;
-        display:flex;
-        flex-direction: column;
+    .data-wrapper{
+        height: 100%;
+        display:grid;
+        grid-template-rows: 0rem 0rem auto;
         border-radius: var(--border-radius);
         box-shadow: 2px 2px 5px #000;
     }
 
-    .flex-wrapper .data-wrapper > div{
+    .data-wrapper > div{
         transition: all 300ms cubic-bezier(.1,.6,1,.9);
-        display: flex;
+		height:100%;
+        /* display: flex; */
         margin: 0.25rem;
         border-radius: var(--border-radius);
-		/* border: 1px solid orange; */
         justify-content: center;
         align-items: center;
         box-shadow: 2px 2px 8px rgba(0,0,0,.5);
     }
-    .flex-wrapper .data-wrapper .data{
-        flex: 5 1 0;
+
+    .data-wrapper.selected-filter{
+        grid-template-rows: 7.5rem 0rem auto;
+    }
+    .data-wrapper.selected-mode{
+        grid-template-rows: 0rem 7.5rem auto;
     }
 
-    .flex-wrapper .data-wrapper .modes,
-    .flex-wrapper .data-wrapper .filters{
-        flex: 0 2 0;
-    }
-
-    .flex-wrapper .data-wrapper.selected-mode .modes,
-    .flex-wrapper .data-wrapper.selected-filter .filters{
-        flex: 1 1 0;
-    }
-
-
-    .flex-wrapper .filters-wrapper > div.selected-filter,
-    .flex-wrapper .modes-wrapper > div.selected-mode{
-        flex: 3 1 0;
-        background: var(--clr-text-green);
-        color: var(--clr-bg-grey);
-		font-weight: 700;
-    }
-
-    .flex-wrapper .filters-wrapper > div:not(.selected-filter),
-    .flex-wrapper .modes-wrapper > div:not(.selected-mode){
+    .filters-wrapper > div:not(.selected-filter),
+    .modes-wrapper > div:not(.selected-mode){
         flex: 1 3 0;
         background: var(--clr-text-grey);
     }
 
-    .flex-wrapper .filters-wrapper > div:hover,
-    .flex-wrapper .modes-wrapper > div:hover{
+    .filters-wrapper > div:hover,
+    .modes-wrapper > div:hover{
         background:var(--clr-bg-green);
         cursor: pointer;
 		color: var(--clr-text-white);
     }
 
-    .flex-wrapper .filters-wrapper > div.selected-filter:hover,
-    .flex-wrapper .modes-wrapper > div.selected-mode:hover{
+    .filters-wrapper > div.selected-filter:hover,
+    .modes-wrapper > div.selected-mode:hover{
 		color: var(--clr-text-white);
     }
 </style>
 
 <template>
-    <div class="flex-wrapper" >
+    <div class="main-wrapper" >
         <div class="filters-wrapper">
             <div
                 v-for="filter in filters"

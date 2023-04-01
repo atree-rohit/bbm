@@ -1,11 +1,10 @@
 <style scoped>
     .species-select-wrapper{
-        background: salmon;
-        width:100%;
         height: 100%;
         border-radius: var(--border-radius);
         padding: .5rem;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 1fr 5fr;
         justify-content: space-between;
         align-items: stretch;
     }
@@ -20,7 +19,7 @@
     .species-select-wrapper .ranks,
     .species-select-wrapper .search,
     .species-select-wrapper .list{
-        border: 1px solid red;
+        border: 1px solid var(--clr-bg-grey);
     }
 
     .species-select-wrapper .search{
@@ -34,10 +33,8 @@
     }
     .species-select-wrapper .list{
         flex: 3 1 auto;
-        overflow-x: hidden;
         overflow-y: auto;
         padding: .25rem .5rem;
-        height: 2rem;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
@@ -48,6 +45,7 @@
         border-radius: .5rem;
         display: flex;
         overflow: hidden;
+        margin:auto;
         transition: all 150ms;
         border: 2px solid transparent;
     }
@@ -127,7 +125,7 @@
             {{ search_string }}
             <input type="text" v-model="search_string">
         </div>
-        <div class="list" :style="{ height: listHeight + 'px' }">
+        <div class="list" >
             <div
                 class="chip"
                 v-for="taxon in filtered_taxa"
@@ -172,16 +170,10 @@ export default defineComponent({
                     const common_index = taxon.common_name?.toLowerCase().indexOf(this.search_string.toLowerCase())
                     return name_index > -1 || common_index > -1
                 }
-            })
+            }).slice(0,50)
         },
-        listHeight(){
-            const searchHeight = document.querySelector('.search')
-            console.log(searchHeight)
-            return searchHeight.offsetHeight + 'px';
-        }
     },
     mounted(){
-        console.log(this.listHeight)
     },
     created(){
         console.log(this.taxa)
