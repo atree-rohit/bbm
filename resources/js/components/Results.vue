@@ -1,6 +1,5 @@
 <style scoped>
     .main-wrapper{
-        height: 100%;
         display:grid;
         grid-gap: 0.5rem;
         grid-template-rows: 2rem 2rem auto;
@@ -32,15 +31,15 @@
     .data-wrapper{
         height: 100%;
         display:grid;
-        grid-template-rows: 0rem 0rem auto;
+        grid-template-rows: 0rem auto;
         border-radius: var(--border-radius);
         box-shadow: 2px 2px 5px #000;
+        transition: all 500ms;
     }
 
     .data-wrapper > div{
         transition: all 300ms cubic-bezier(.1,.6,1,.9);
 		height:100%;
-        /* display: flex; */
         margin: 0.25rem;
         border-radius: var(--border-radius);
         justify-content: center;
@@ -48,11 +47,9 @@
         box-shadow: 2px 2px 8px rgba(0,0,0,.5);
     }
 
-    .data-wrapper.selected-filter{
-        grid-template-rows: 7.5rem 0rem auto;
-    }
+    .data-wrapper.selected-filter, 
     .data-wrapper.selected-mode{
-        grid-template-rows: 0rem 7.5rem auto;
+        grid-template-rows: 10rem auto;
     }
 
     .filters-wrapper > div.selected-filter,
@@ -76,6 +73,13 @@
     .filters-wrapper > div.selected-filter:hover,
     .modes-wrapper > div.selected-mode:hover{
 		color: var(--clr-text-white);
+    }
+
+    @media screen and (min-width: 800px) {
+        .data-wrapper.selected-filter, 
+        .data-wrapper.selected-mode{
+            grid-template-rows: 7.5rem auto;
+        }
     }
 </style>
 
@@ -101,15 +105,15 @@
         </div>
         <div
             class="data-wrapper"
-            :class="{'selected-mode': selected_tab.mode, 'selected-filter': selected_tab.filter}"
+            :class="{'selected-filter': (selected_tab.filter || selected_tab.mode)}"
         > 
             <div class="filters">
 				<SelectSpecies v-if="selected_tab.filter == 'species'"/>
 				<SelectUser v-else-if="selected_tab.filter == 'user'"/>
 				<SelectPortal v-else-if="selected_tab.filter == 'portal'"/>
-				<span v-else>{{ capatilizeWord(selected_tab.filter) }}</span>
+				<span v-else-if="selected_tab.filter">{{ capatilizeWord(selected_tab.filter) }}</span>
+				<span v-else>{{ capatilizeWord(selected_tab.mode) }}</span>
 			</div>
-            <div class="modes">{{ capatilizeWord(selected_tab.mode) }}</div>
             <div class="data">
                 Data
                 <pre>
@@ -151,33 +155,18 @@
     },
     methods: {
 		capatilizeWord(str){
-			if(!str){
-				return ""
-			}
-			return str.charAt(0).toUpperCase() + str.slice(1)
+			return str ? str.charAt(0).toUpperCase() + str.slice(1) : ""
 		},
 		filterClass(filter){
-			let op = filter
-			if(this.selected_tab.filter == filter){
-				op += " selected-filter"
-			} 
-			return op
+			return (this.selected_tab.filter == filter) ? filter + " selected-filter" : filter
 		},
 		modeClass(filter){
-			let op = filter
-			if(this.selected_tab.mode == filter){
-				op += " selected-mode"
-			} 
-			return op
+			return (this.selected_tab.mode == filter) ? filter + " selected-mode" : filter
 		},
 		select(val, type){
-			if(type == "filter"){
-				this.selected_tab.mode = null
-				this.selected_tab.filter = (this.selected_tab.filter == val) ? null : val
-			} else if(type == "mode"){
-				this.selected_tab.filter = null
-				this.selected_tab.mode = (this.selected_tab.mode == val) ? null : val
-			}
+            const oppositeType = (type === "filter") ? "mode" : "filter";
+            this.selected_tab[oppositeType] = null;
+            this.selected_tab[type] = (this.selected_tab[type] === val) ? null : val;
 		}
     }
   })
