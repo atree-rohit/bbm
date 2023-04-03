@@ -91,7 +91,12 @@ class ApiController extends Controller
                     $current_observation[$f] = $observation->{$f};
                 }
                 $current_observation["img"] = $observation->img_url;
-                $current_observation["date"] = str_replace("/", "-", $observation->observed_on);
+                if(strpos($observation->observed_on, "-")){
+                    $date = explode("-", $observation->observed_on);
+                    $current_observation["date"] = $date[2] . "-" . $date[1] . "-" . $date[0];
+                } else {
+                    $current_observation["date"] = str_replace("/", "-", $observation->observed_on);
+                }
                 $cleaned_data->push($current_observation);
             }
         }
@@ -115,7 +120,9 @@ class ApiController extends Controller
 
                 $current_observation["img"] = "https://indiabiodiversity.org/files-api/api/get/raw/observations//" . $observation["associatedMedia"];
                 $current_observation["date"] = $new_date;
-                $cleaned_data->push($current_observation);
+                if(date("Y-m-d", $timestamp) > "2020-01-01"){
+                    $cleaned_data->push($current_observation);
+                }
             }
         }
         return $cleaned_data;
@@ -134,7 +141,9 @@ class ApiController extends Controller
                 }
                 $current_observation["id"] = $observation->boi_id . "-" . $observation->id;
                 $current_observation["date"] = date_format(date_create_from_format('d/m/y', $observation->observed_date), 'd-m-Y');
-                $cleaned_data->push($current_observation);
+                if(date_format(date_create_from_format('d/m/y', $observation->observed_date), 'Y-m-d') > "2020-01-01"){
+                    $cleaned_data->push($current_observation);
+                }
             }
         }
         return $cleaned_data;
