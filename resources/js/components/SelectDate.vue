@@ -93,7 +93,10 @@ export default defineComponent({
                     break
 
                 case "Day of the Week":
-                    const days = [...new Set(data.map((d) => new Date(d.date).getDay()))]
+                    const days = [...new Set(data.map((d) => {
+                        const [day, month, year] = d.date.split("-").map(Number)
+                        return new Date(year, month-1, day).getDay()
+                    }))]
                     const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
                     days.map((d) => {
                         if(d >= 0){

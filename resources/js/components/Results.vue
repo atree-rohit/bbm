@@ -76,6 +76,17 @@
     .filters-wrapper > div.selected-mode:hover{
 		color: var(--clr-text-white);
     }
+    .data{
+        display:flex;
+    }
+    .data > div{
+        border: 1px solid red;
+        flex: 1 1 0;
+        height: 100%;
+        display: grid;
+        justify-content: center;
+        align-items: center;
+    }
 
     @media screen and (min-width: 800px) {
         .data-wrapper.selected-filter, 
@@ -119,11 +130,15 @@
 				<span v-else>{{ capatilizeWord(selected_tab.mode) }}</span>
 			</div>
             <div class="data">
-                Data
-                {{ selected_tab }}
-                <pre>
-                    {{ selected }}
-                </pre>
+                <IndiaMap></IndiaMap>
+                <!-- <div>
+                    <pre>
+                        {{ selected }}
+                    </pre>
+                </div>
+                <div>
+                    {{ filtered_observations.length }}
+                </div> -->
             </div>
         </div>
       </div>
@@ -137,6 +152,7 @@
   import SelectDate from "./SelectDate.vue"
   import SelectUser from "./SelectUser.vue"
   import SelectPortal from "./SelectPortal.vue"
+  import IndiaMap from "./IndiaMap.vue"
 
   export default defineComponent({
 	name: "Results",
@@ -146,6 +162,7 @@
         SelectDate,
 		SelectUser,
 		SelectPortal,
+        IndiaMap,
 	},
     data() {
 		return {
@@ -160,7 +177,10 @@
 		};
     },
     computed: {
-        ...mapState(["selected"])
+        ...mapState([
+            "filtered_observations",
+            "selected"
+        ])
     },
     methods: {
 		capatilizeWord(str){

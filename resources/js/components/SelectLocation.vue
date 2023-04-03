@@ -78,7 +78,10 @@ export default defineComponent({
             const data = Object.values(this.observations).flat()
 
             if(this.selected_location_filter == "District" || this.selected_location_filter == ""){
-                const districts = [...new Set(data.map((o) => o.district))]
+                let districts = [...new Set(data.map((o) => o.district))]
+                if(this.selected.location.state.length > 0){
+                    districts = [...new Set(data.filter((o) => this.selected.location.state.includes(o.state)).map((o) => o.district))]
+                }
                 districts.forEach((d) => {
                     op.push({
                         type: "Di",
@@ -106,7 +109,6 @@ export default defineComponent({
         },
     },
     mounted(){
-        console.log(this.filtered_locations)
     },
     methods:{
         selectLocation(location){

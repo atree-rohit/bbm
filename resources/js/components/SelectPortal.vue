@@ -53,7 +53,7 @@ export default defineComponent({
         return{
             portals: [
                 {
-                    id: "count",
+                    id: "counts",
                     name: "Big Butterfly Month Counts"
                 },
                 {
