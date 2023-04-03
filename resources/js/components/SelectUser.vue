@@ -28,7 +28,7 @@
     border: 1px solid var(--clr-bg-green);
     border-radius: 0.25rem;
     }
-    .users{
+    .users-list{
         border: 1px solid var(--clr-bg-grey);
         border-radius: var(--border-radius);
         overflow-y: auto;
@@ -40,7 +40,7 @@
         width: 100%;
     }
 
-    .users .chip{
+    .users-list .chip{
         border-radius: .5rem;
         display: flex;
         overflow: hidden;
@@ -48,35 +48,35 @@
         transition: all 150ms;
         border: 2px solid transparent;
     }
-    .users .chip:hover{
+    .users-list .chip:hover{
         border-color: var(--clr-text-green);
         cursor: pointer;
     }
 
-    .users .chip.selected:hover{
+    .users-list .chip.selected:hover{
         border-color: red;
     }
 
-    .users .chip .portal,
-    .users .chip .name{
+    .users-list .chip .portal,
+    .users-list .chip .name{
         padding: 0.125rem 0.25rem;
         display: flex;
         align-items: center;
     }
-    .users .chip .portal{
+    .users-list .chip .portal{
         background: var(--clr-bg-blue);
         color: white;
         font-size: .8rem;
     }
-    .users .chip .name{
+    .users-list .chip .name{
         background: var(--clr-bg-grey);
         font-size: .75rem;
     }
 
-    .users .chip.selected .portal{
+    .users-list .chip.selected .portal{
         background: var(--clr-bg-green);
     }
-    .users .chip.selected .name{
+    .users-list .chip.selected .name{
         color: var(--clr-text-green);
     }
 
@@ -133,7 +133,7 @@
                 <input type="text" v-model="search_string" placeholder="Enter User Name to filter the list...">
             </div>
         </div>
-        <div class="users">
+        <div class="users-list">
             <div
                 class="chip"
                 v-for="user in filtered_users"

@@ -107,7 +107,7 @@
             class="data-wrapper"
             :class="{'selected-filter': (selected_tab.filter || selected_tab.mode)}"
         > 
-            <div class="filters">
+            <div class="filters-area">
 				<SelectSpecies v-if="selected_tab.filter == 'species'"/>
 				<SelectUser v-else-if="selected_tab.filter == 'user'"/>
 				<SelectPortal v-else-if="selected_tab.filter == 'portal'"/>
