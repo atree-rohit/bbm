@@ -12,7 +12,6 @@
         align-items: center;
         padding: 0rem;
         grid-gap: 0rem;
-        min-width: 90vw;
     }
 
     .portals{
@@ -21,84 +20,6 @@
         justify-content: space-around;
         align-items: center;
         padding: 0rem;
-    }
-    .search input{
-        width: 100%;
-    padding: 0.25rem;
-    border: 1px solid var(--clr-bg-green);
-    border-radius: 0.25rem;
-    }
-    .users-list{
-        border: 1px solid var(--clr-bg-grey);
-        border-radius: var(--border-radius);
-        overflow-y: auto;
-        padding: .25rem .5rem;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.25rem 0.5rem;
-        width: 100%;
-    }
-
-    .users-list .chip{
-        border-radius: .5rem;
-        display: flex;
-        overflow: hidden;
-        margin:auto;
-        transition: all 150ms;
-        border: 2px solid transparent;
-    }
-    .users-list .chip:hover{
-        border-color: var(--clr-text-green);
-        cursor: pointer;
-    }
-
-    .users-list .chip.selected:hover{
-        border-color: red;
-    }
-
-    .users-list .chip .portal,
-    .users-list .chip .name{
-        padding: 0.125rem 0.25rem;
-        display: flex;
-        align-items: center;
-    }
-    .users-list .chip .portal{
-        background: var(--clr-bg-blue);
-        color: white;
-        font-size: .8rem;
-    }
-    .users-list .chip .name{
-        background: var(--clr-bg-grey);
-        font-size: .75rem;
-    }
-
-    .users-list .chip.selected .portal{
-        background: var(--clr-bg-green);
-    }
-    .users-list .chip.selected .name{
-        color: var(--clr-text-green);
-    }
-
-    .btn{
-        border: 1px solid var(--clr-bg-blue);
-        color: var(--clr-bg-blue);
-        padding: .5rem 0.25rem;
-        font-size: 0.75rem;
-        border-radius: .5rem;
-    }
-
-
-    .btn.selected{
-        border: 1px solid transparent;
-        color: var(--clr-text-white);
-        background: var(--clr-bg-green);
-        
-    }
-
-    .btn:hover{
-        cursor: pointer;
-        background: var(--clr-bg-light-blue);
     }
 
     @media screen and (min-width: 800px) {
@@ -117,11 +38,11 @@
 </style>
 
 <template>
-    <div class="users-select-wrapper">
+    <div class="users-select-wrapper toggle-search-list">
         <div class="user-filters">
-            <div class="portals">
+            <div class="toggle-btns">
                 <button
-                    class="btn"
+                    class="toggle-btn"
                     v-for="portal in portals"
                     :key="portal.id"
                     :class="portalClass(portal.id)"
@@ -133,7 +54,7 @@
                 <input type="text" v-model="search_string" placeholder="Enter User Name to filter the list...">
             </div>
         </div>
-        <div class="users-list">
+        <div class="list">
             <div
                 class="chip"
                 v-for="user in filtered_users"

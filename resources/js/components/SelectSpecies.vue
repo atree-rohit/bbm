@@ -6,112 +6,12 @@
         grid-template-columns: auto;
         justify-content: center;
     }
-    
     .species-filters{
         display: grid;
         grid-template-rows: 1fr 1fr;
         align-items: center;
         padding: 0rem;
         grid-gap: 0rem;
-    }
-
-    .species-filters .ranks{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0rem ;
-    }
-    .species-list{
-        height: 100%;
-        overflow-y: auto;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.125rem 0.25rem;
-        border: 2px solid var(--clr-bg-grey);
-    }
-
-
-    .species-list .search{
-        flex: 1 3 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        padding:  0 0.25rem;
-        gap: 1rem;
-    }
-
-    .species-filters .search input{
-        width: 100%;
-        padding: .25rem;
-        border: 1px solid var(--clr-bg-green);
-        border-radius: .25rem;
-    }
-
-    .species-list .chip{
-        border-radius: .5rem;
-        display: flex;
-        overflow: hidden;
-        margin:auto;
-        transition: all 150ms;
-        border: 2px solid transparent;
-    }
-    .species-list .chip:hover{
-        border-color: var(--clr-text-green);
-        cursor: pointer;
-    }
-
-    .species-list .chip.selected:hover{
-        border-color: red;
-    }
-
-    .chip .name,
-    .chip .common{
-        padding: 0.125rem 0.25rem;
-        display: flex;
-        align-items: center;
-    }
-    .chip .name{
-        background: var(--clr-bg-blue);
-        color: white;
-        font-size: .8rem;
-    }
-    .chip .common{
-        background: var(--clr-bg-grey);
-        font-size: .75rem;
-        display: none;
-    }
-
-    .chip.selected .name{
-        background: var(--clr-bg-green);
-    }
-    .chip.selected .common{
-        color: var(--clr-text-green);
-        display: block;
-    }
-
-
-    .btn{
-        border: 1px solid var(--clr-bg-blue);
-        color: var(--clr-bg-blue);
-        padding: .5rem 0.25rem;
-        font-size: 0.75rem;
-        border-radius: .5rem;
-    }
-
-
-    .btn.selected{
-        border: 1px solid transparent;
-        color: var(--clr-text-white);
-        background: var(--clr-bg-green);
-        
-    }
-
-    .btn:hover{
-        cursor: pointer;
-        background: var(--clr-bg-light-blue);
     }
 
     @media screen and (min-width: 800px) {
@@ -122,19 +22,16 @@
             grid-template-rows: auto;
             justify-content: space-between;
         }
-        .chip .common{
-            display: block;
-        }
     }
 
 </style>
 
 <template>
-    <div class="species-select-wrapper">
+    <div class="species-select-wrapper toggle-search-list">
         <div class="species-filters">
-            <div class="ranks">
+            <div class="toggle-btns">
                 <button
-                    class="btn"
+                    class="toggle-btn"
                     v-for="rank in ranks"
                     :key="rank"
                     :class="rankClass(rank)"
@@ -147,7 +44,7 @@
                 <input type="text" v-model="search_string" placeholder="Enter scientific name or common name to filter the list...">
             </div>
         </div>
-        <div class="species-list" >
+        <div class="list" >
             <div
                 class="chip"
                 v-for="taxon in filtered_taxa"
@@ -157,7 +54,7 @@
                 :title="taxon.rank"
             >
                 <div class="name" v-text="taxon.name"/>
-                <div class="common" v-text="taxon.common_name" v-if="taxon.common_name" />
+                <div class="common hidden" v-text="taxon.common_name" v-if="taxon.common_name" />
             </div>
         </div>
     </div>
