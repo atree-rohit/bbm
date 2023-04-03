@@ -8,7 +8,7 @@
     }
     .location-filters{
         display: grid;
-        grid-template-rows: 1fr 1fr;
+        /* grid-template-rows: 1fr 1fr; */
         align-items: center;
         padding: 0rem;
         grid-gap: 0rem;
@@ -44,10 +44,10 @@
                 class="chip"
                 v-for="location in filtered_locations"
                 :key="location.id"
+                :class="{ selected: (selected.location.state.indexOf(location.name) > -1 || selected.location.district.indexOf(location.name) > -1) }"
                 @click="selectLocation(location)"
-                :title="location.rank"
+                :title="(location.type == 'Di') ? 'District' : 'State'"
                 >
-                <!-- :class="{ selected: selected.location.indexOf(location.id) > -1 }" -->
                 <div class="type hidden" v-text="location.type"/>
                 <div class="name" v-text="location.name" v-if="location.name" />
             </div>
@@ -93,6 +93,12 @@ export default defineComponent({
                         type: "St",
                         name: s,
                     })
+                })
+            }
+            if(this.selected_location_filter == "Bounding Box"){
+                op.push({
+                    type: "BB",
+                    name: "Bounding Box",
                 })
             }
 

@@ -16,7 +16,10 @@ export default createStore({
                 district: [],
                 bounding_box: []
             },
-            date: null,
+            date: {
+                year: [],
+                day: [],
+            },
             users: [],
         }
     },
@@ -72,6 +75,22 @@ export default createStore({
             } else {
                 state.selected.location.district.push(district_name)
             }
+        },
+        SET_SELECTED_YEAR(state, year){
+            const index = state.selected.date.year.indexOf(year)
+            if(index > -1){
+                state.selected.date.year.splice(index, 1)
+            } else {
+                state.selected.date.year.push(year)
+            }
+        },
+        SET_SELECTED_DAY(state, day){
+            const index = state.selected.date.day.indexOf(day)
+            if(index > -1){
+                state.selected.date.day.splice(index, 1)
+            } else {
+                state.selected.date.day.push(day)
+            }
         }
     },
     actions:{
@@ -109,6 +128,12 @@ export default createStore({
         },
         selectDistrict({commit}, payload){
             commit('SET_SELECTED_DISTRICT', payload)
+        },
+        selectDateYear({commit}, payload){
+            commit('SET_SELECTED_YEAR', payload)
+        },
+        selectDateDay({commit}, payload){
+            commit('SET_SELECTED_DAY', payload)
         }
     },
     getters:{
