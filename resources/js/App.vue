@@ -10,7 +10,7 @@
         position: relative;
         top: 3.7rem;
         height: calc(100vh - 4rem);
-        overflow-y: scroll;
+        overflow-y: auto;
         border: 1px solid yellowgreen;
     }
 
