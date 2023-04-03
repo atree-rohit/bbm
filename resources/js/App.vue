@@ -55,6 +55,8 @@ import Videos from './components/Videos.vue'
 import Results from './components/Results.vue'
 import Partners from './components/Partners.vue'
 import SpeciesPage from './components/SpeciesPage.vue'
+
+import d from "./geojson/districts_2023.json"
 export default defineComponent({
     name: "App",
     components: {
@@ -74,6 +76,23 @@ export default defineComponent({
     created(){
         store.dispatch('getAllData')
         this.set_page()
+
+        const capitalizeWords = (str) =>  str.replace(/\b\w/g, (match) => match.toUpperCase())
+
+        let op = {
+            "type": "FeatureCollection",
+            "features": []
+        }
+        console.clear()
+        d.features.forEach((feature) => {
+            feature.properties = {
+                state: capitalizeWords(feature.properties.stname.toLowerCase()),
+                district: feature.properties.dtname,
+            }
+            op.features.push(feature)
+        })
+        console.log(op)
+
     },
     computed:{
         ...mapState([
