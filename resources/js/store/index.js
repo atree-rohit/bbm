@@ -8,8 +8,9 @@ export default createStore({
         taxa: [],
         users: [],
         observations: {},
+        filtered_observations:[],
         selected: {
-            portals:["count", "inat", "ibp", "ifb"],
+            portals:["counts", "inat", "ibp", "ifb"],
             taxa: [],
             location: {
                 state: [],
@@ -91,6 +92,38 @@ export default createStore({
             } else {
                 state.selected.date.day.push(day)
             }
+        },
+        SET_FILTERED_OBSERVATIONS(state){
+            state.filtered_observations = Object.values(state.observations).flat()
+            if(state.selected.portals.length > 0 && state.selected.portals.length < 4){
+                state.filtered_observations = []
+                state.selected.portals.forEach((p) => {
+                    state.filtered_observations = state.filtered_observations.concat(state.observations[p])
+                })
+            }
+            if(state.selected.taxa.length > 0){
+                state.filtered_observations = state.filtered_observations.filter(observation => state.selected.taxa.includes(observation.taxa_id))
+            }
+            if(state.selected.location.state.length > 0){
+                state.filtered_observations = state.filtered_observations.filter(observation => state.selected.location.state.includes(observation.state))
+            }
+            if(state.selected.location.district.length > 0){
+                state.filtered_observations = state.filtered_observations.filter(observation => state.selected.location.district.includes(observation.district))
+            }
+            if(state.selected.date.year.length > 0){
+                state.filtered_observations = state.filtered_observations.filter((observation) => state.selected.date.year.includes(observation.date.split("-")[2]))
+            }
+            if(state.selected.date.day.length > 0){
+                const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                state.filtered_observations = state.filtered_observations.filter((observation) => {
+                    const [day, month, year] = observation.date.split("-").map(Number)
+                    let date = new Date(year, month-1, day).getDay()
+                    return state.selected.date.day.includes(daysOfWeek[date])
+                })
+            }
+            if(state.selected.users.length > 0){
+                state.filtered_observations = state.filtered_observations.filter((observation) => state.selected.users.includes(observation.user_id))
+            }
         }
     },
     actions:{
@@ -109,6 +142,7 @@ export default createStore({
                 .then(response => {
                     commit('SET_OBSERVATIONS', response.data)
                     console.info("Observations set")
+                    commit('SET_FILTERED_OBSERVATIONS')
                 })
         },
         gotoPage({commit}, payload){
@@ -116,25 +150,32 @@ export default createStore({
         },
         selectTaxa({commit}, payload){
             commit('SET_SELECTED_TAXA', payload)
-        },
-        selectUser({commit}, payload){
-            commit('SET_SELECTED_USER', payload)
-        },
-        selectPortal({commit}, payload){
-            commit('SET_SELECTED_PORTAL', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
         },
         selectState({commit}, payload){
             commit('SET_SELECTED_STATE', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
         },
         selectDistrict({commit}, payload){
             commit('SET_SELECTED_DISTRICT', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
         },
         selectDateYear({commit}, payload){
             commit('SET_SELECTED_YEAR', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
         },
         selectDateDay({commit}, payload){
             commit('SET_SELECTED_DAY', payload)
-        }
+            commit('SET_FILTERED_OBSERVATIONS')
+        },
+        selectUser({commit}, payload){
+            commit('SET_SELECTED_USER', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
+        },
+        selectPortal({commit}, payload){
+            commit('SET_SELECTED_PORTAL', payload)
+            commit('SET_FILTERED_OBSERVATIONS')
+        },
     },
     getters:{
     }
