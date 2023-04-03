@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\DataCleanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,3 +27,4 @@ Route::get('/partners', [HomeController::class, 'home']);
 
 
 Route::get('/import_data', [ImportController::class, 'import']);
+Route::get('/clean', [DataCleanController::class, 'clean']);
