@@ -4,12 +4,13 @@
     display:flex;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0 1rem;
 }
 
 .portals-wrapper .btn{
     border: 1px solid red;
-    padding: .5rem;
+    padding: 0.5rem 1rem;
     border-radius:0rem 1.5rem;
     transition: all 250ms;
 }
