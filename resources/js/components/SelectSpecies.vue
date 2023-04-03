@@ -1,34 +1,39 @@
 <style scoped>
     .species-select-wrapper{
         height: 100%;
-        border-radius: var(--border-radius);
-        padding: .5rem;
         display: grid;
-        grid-template-columns: 1fr 5fr;
-        justify-content: space-between;
-        align-items: stretch;
-    }
-    .species-select-wrapper .ranks{
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        padding: 0 1rem ;
-        gap: .125rem;
+        grid-template-rows: 1fr 2fr;
+        grid-template-columns: auto;
+        justify-content: center;
     }
     
-    .species-select-wrapper .filters,
-    .species-select-wrapper .list{
-        border: 1px solid var(--clr-bg-grey);
-        height: 100%;
-    }
-
-    .species-select-wrapper .filters > div{
-        flex: 1 1 0;
-        display:flex;
+    .species-filters{
+        display: grid;
+        grid-template-rows: 1fr 1fr;
         align-items: center;
+        padding: 0rem;
+        grid-gap: 0rem;
     }
 
-    .species-select-wrapper .search{
+    .species-filters .ranks{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0rem ;
+    }
+    .species-list{
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.125rem 0.25rem;
+        border: 2px solid var(--clr-bg-grey);
+    }
+
+
+    .species-list .search{
         flex: 1 3 0;
         display: flex;
         flex-direction: column;
@@ -37,17 +42,15 @@
         padding:  0 0.25rem;
         gap: 1rem;
     }
-    .species-select-wrapper .list{
-        flex: 3 1 auto;
-        overflow-y: auto;
-        padding: .25rem .5rem;
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 0.25rem 0.5rem;
+
+    .species-filters .search input{
+        width: 100%;
+        padding: .25rem;
+        border: 1px solid var(--clr-bg-green);
+        border-radius: .25rem;
     }
 
-    .species-select-wrapper .list .chip{
+    .species-list .chip{
         border-radius: .5rem;
         display: flex;
         overflow: hidden;
@@ -55,54 +58,53 @@
         transition: all 150ms;
         border: 2px solid transparent;
     }
-    .species-select-wrapper .list .chip:hover{
+    .species-list .chip:hover{
         border-color: var(--clr-text-green);
         cursor: pointer;
     }
 
-    .species-select-wrapper .list .chip.selected:hover{
+    .species-list .chip.selected:hover{
         border-color: red;
     }
 
-    .species-select-wrapper .list .chip .name,
-    .species-select-wrapper .list .chip .common{
+    .chip .name,
+    .chip .common{
         padding: 0.125rem 0.25rem;
         display: flex;
         align-items: center;
     }
-    .species-select-wrapper .list .chip .name{
+    .chip .name{
         background: var(--clr-bg-blue);
         color: white;
         font-size: .8rem;
     }
-    .species-select-wrapper .list .chip .common{
+    .chip .common{
         background: var(--clr-bg-grey);
         font-size: .75rem;
+        display: none;
     }
 
-    .species-select-wrapper .list .chip.selected .name{
+    .chip.selected .name{
         background: var(--clr-bg-green);
     }
-    .species-select-wrapper .list .chip.selected .common{
+    .chip.selected .common{
         color: var(--clr-text-green);
+        display: block;
     }
 
-    .species-select-wrapper .search input{
-        width: 100%;
-        padding: .25rem;
-        border: 1px solid var(--clr-bg-green);
-        border-radius: .25rem;
-    }
 
     .btn{
-        border: 1px solid var(--clr-bg-green);
+        border: 1px solid var(--clr-bg-blue);
+        color: var(--clr-bg-blue);
         padding: .5rem 0.25rem;
-        border-radius: .25rem;
+        font-size: 0.75rem;
+        border-radius: .5rem;
     }
 
 
     .btn.selected{
-        border: 1px solid var(--clr-text-green);
+        border: 1px solid transparent;
+        color: var(--clr-text-white);
         background: var(--clr-bg-green);
         
     }
@@ -112,11 +114,27 @@
         background: var(--clr-bg-light-blue);
     }
 
+    @media screen and (min-width: 800px) {
+        .species-select-wrapper{
+            height: 100%;
+            border-radius: var(--border-radius);
+            padding: .5rem;
+            display: grid;
+            grid-template-columns: 1fr 3fr;
+            grid-template-rows: auto;
+            justify-content: space-between;
+            align-items: stretch;
+        }
+        .chip .common{
+            display: block;
+        }
+    }
+
 </style>
 
 <template>
     <div class="species-select-wrapper">
-        <div class="filters">
+        <div class="species-filters">
             <div class="ranks">
                 <button
                     class="btn"
@@ -129,10 +147,10 @@
                     
             </div>
             <div class="search">
-                <input type="text" v-model="search_string">
+                <input type="text" v-model="search_string" placeholder="Enter scientific name or common name to filter the list...">
             </div>
         </div>
-        <div class="list" >
+        <div class="species-list" >
             <div
                 class="chip"
                 v-for="taxon in filtered_taxa"
@@ -142,7 +160,7 @@
                 :title="taxon.rank"
             >
                 <div class="name" v-text="taxon.name"/>
-                <div class="common" v-text="taxon.common_name"/>
+                <div class="common" v-text="taxon.common_name" v-if="taxon.common_name" />
             </div>
         </div>
     </div>
@@ -178,14 +196,13 @@ export default defineComponent({
                     const common_index = taxon.common_name?.toLowerCase().indexOf(this.search_string.toLowerCase())
                     return name_index > -1 || common_index > -1
                 }
-            }).slice(0,50)
+            }).sort((a,b) => a.name.localeCompare(b.name))
         },
     },
     mounted(){
     },
     created(){
-        console.log(this.taxa)
-        // console.log(this.listHeight)
+        // console.log(this.taxa)
     },
     methods:{
         rankClass(rank: string){
