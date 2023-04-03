@@ -116,14 +116,11 @@
 
     @media screen and (min-width: 800px) {
         .species-select-wrapper{
-            height: 100%;
             border-radius: var(--border-radius);
             padding: .5rem;
-            display: grid;
             grid-template-columns: 1fr 3fr;
             grid-template-rows: auto;
             justify-content: space-between;
-            align-items: stretch;
         }
         .chip .common{
             display: block;
