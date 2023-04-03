@@ -52,16 +52,18 @@
         grid-template-rows: 10rem auto;
     }
 
-    .filters-wrapper > div.selected-filter,
-    .filters-wrapper > div.selected-mode{
-        background: var(--clr-bg-light-blue);
-    }
-
     .filters-wrapper > div:not(.selected-filter),
     .filters-wrapper > div:not(.selected-mode){
         flex: 1 3 0;
         background: var(--clr-text-grey);
     }
+
+    .filters-wrapper > div.selected-filter,
+    .filters-wrapper > div.selected-mode{
+        background: var(--clr-bg-light-blue);
+    }
+
+
 
     .filters-wrapper > div:hover,
     .filters-wrapper > div:hover{
