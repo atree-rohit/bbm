@@ -7,15 +7,15 @@
         padding: 0.5rem;
     }
 
-    .filters-wrapper,
-    .modes-wrapper{
+    .filters-wrapper{
         display:flex;
         border-radius: 1rem;
         overflow: hidden;
+        justify-content: center;
+        align-items: center;
     }
 
-    .filters-wrapper > div, 
-    .modes-wrapper > div{
+    .filters-wrapper > div{
         flex: 1 1 0;
         box-shadow: .25rem .25rem 0.5rem #bbb;
         transition: all 250ms ease;
@@ -53,25 +53,25 @@
     }
 
     .filters-wrapper > div.selected-filter,
-    .modes-wrapper > div.selected-mode{
+    .filters-wrapper > div.selected-mode{
         background: var(--clr-bg-light-blue);
     }
 
     .filters-wrapper > div:not(.selected-filter),
-    .modes-wrapper > div:not(.selected-mode){
+    .filters-wrapper > div:not(.selected-mode){
         flex: 1 3 0;
         background: var(--clr-text-grey);
     }
 
     .filters-wrapper > div:hover,
-    .modes-wrapper > div:hover{
+    .filters-wrapper > div:hover{
         background:var(--clr-bg-green);
         cursor: pointer;
 		color: var(--clr-text-white);
     }
 
     .filters-wrapper > div.selected-filter:hover,
-    .modes-wrapper > div.selected-mode:hover{
+    .filters-wrapper > div.selected-mode:hover{
 		color: var(--clr-text-white);
     }
 
@@ -94,7 +94,7 @@
                 v-text="capatilizeWord(filter)"
             />
         </div>
-        <div class="modes-wrapper">
+        <div class="filters-wrapper">
             <div
                 v-for="mode in modes"
                 :key="mode"
@@ -109,6 +109,8 @@
         > 
             <div class="filters-area">
 				<SelectSpecies v-if="selected_tab.filter == 'species'"/>
+				<SelectLocation v-else-if="selected_tab.filter == 'location'"/>
+				<SelectDate v-else-if="selected_tab.filter == 'date'"/>
 				<SelectUser v-else-if="selected_tab.filter == 'user'"/>
 				<SelectPortal v-else-if="selected_tab.filter == 'portal'"/>
 				<span v-else-if="selected_tab.filter">{{ capatilizeWord(selected_tab.filter) }}</span>
@@ -116,6 +118,7 @@
 			</div>
             <div class="data">
                 Data
+                {{ selected_tab }}
                 <pre>
                     {{ selected }}
                 </pre>
@@ -128,6 +131,8 @@
   import { defineComponent } from 'vue'
   import { mapState } from "vuex"
   import SelectSpecies from "./SelectSpecies.vue"
+  import SelectLocation from "./SelectLocation.vue"
+  import SelectDate from "./SelectDate.vue"
   import SelectUser from "./SelectUser.vue"
   import SelectPortal from "./SelectPortal.vue"
 
@@ -135,6 +140,8 @@
 	name: "Results",
 	components: {
         SelectSpecies,
+        SelectLocation,
+        SelectDate,
 		SelectUser,
 		SelectPortal,
 	},
