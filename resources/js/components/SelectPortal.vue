@@ -11,7 +11,7 @@
 .portals-wrapper .btn{
     border: 1px solid red;
     padding: 0.5rem 1rem;
-    border-radius:0rem 1.5rem;
+    border-radius: 0.5rem 1rem;
     transition: all 250ms;
 }
 
@@ -19,7 +19,7 @@
     border: 1px solid var(--clr-bg-green);
     background: var(--clr-bg-green);
     color: var(--clr-bg-grey);
-    border-radius: 1.5rem 0rem;
+    border-radius: 1rem 0.5rem;
 }
 
 .portals-wrapper .btn:hover{
