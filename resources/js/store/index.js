@@ -11,7 +11,11 @@ export default createStore({
         selected: {
             portals:["count", "inat", "ibp", "ifb"],
             taxa: [],
-            location: null,
+            location: {
+                state: [],
+                district: [],
+                bounding_box: []
+            },
             date: null,
             users: [],
         }
@@ -52,6 +56,22 @@ export default createStore({
             } else {
                 state.selected.users.push(user)
             }
+        },
+        SET_SELECTED_STATE(state, state_name){
+            const index = state.selected.location.state.indexOf(state_name)
+            if(index > -1){
+                state.selected.location.state.splice(index, 1)
+            } else {
+                state.selected.location.state.push(state_name)
+            }
+        },
+        SET_SELECTED_DISTRICT(state, district_name){
+            const index = state.selected.location.district.indexOf(district_name)
+            if(index > -1){
+                state.selected.location.district.splice(index, 1)
+            } else {
+                state.selected.location.district.push(district_name)
+            }
         }
     },
     actions:{
@@ -83,6 +103,12 @@ export default createStore({
         },
         selectPortal({commit}, payload){
             commit('SET_SELECTED_PORTAL', payload)
+        },
+        selectState({commit}, payload){
+            commit('SET_SELECTED_STATE', payload)
+        },
+        selectDistrict({commit}, payload){
+            commit('SET_SELECTED_DISTRICT', payload)
         }
     },
     getters:{
