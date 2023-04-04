@@ -12,30 +12,74 @@ class DataCleanController extends Controller
 {
     public function clean()
     {
-        ini_set('max_execution_time', 180); //3 minutes
-        $data = InatObservation::where("district", null)->get();
-        $districts = json_decode(file_get_contents(public_path("data/geojson/districts.json")));
+        ini_set('max_execution_time', 600); //3 minutes
+        // $data = InatObservation::where("district", null)->get();
+        // $data = IbpObservation::where("district", null)->get();
+        // $data = IfbObservation::where("district", null)->get();
+        $data = CountForm::where("district", null)->get();
+        $districts = json_decode(file_get_contents(public_path("data/geojson/districts_2023_clean.json")));
+        
+        
         $unmatched = [];
         foreach($data as $d){
             $set_flag = false;
+            
             foreach($districts->features as $district){
-                $p = $district->geometry->coordinates[0];
-                $x = $this->isWithinBounds($d->longitude, $d->latitude, $p);
-                if($x){
-                    $d->state = $district->properties->state;
-                    $d->district = $district->properties->district;
-                    $d->save();
-                    $set_flag = true;
+                foreach($district->geometry->coordinates as $p){
+                    $lat = round($d->latitude, 4);
+                    $lon  = round($d->longitude, 4);
+                    $x = $this->isWithinBounds($lon, $lat, $p);
+                    if($x){
+                        $d->state = $district->properties->state;
+                        $d->district = $district->properties->district;
+                        dd($d);
+                        $d->save();
+                        $set_flag = true;
+                        break;
+                    }
+                }
+                if($set_flag){
+                    break;
                 }
             }
             if(!$set_flag){
-                $unmatched[] = $d->id;
+                $unmatched[] = [$d->id, $d->latitude, $d->longitude];
             }
         }
         dd("success", $unmatched);
     }
 
-    public function isWithinBounds($x, $y, $polygon)
+    private function isWithinBounds($lon, $lat, $polygon) {
+        $intersections = 0;
+    
+        $vertices = count($polygon);
+        for ($i = 0; $i < $vertices; $i++) {
+            $j = ($i + 1) % $vertices;
+    
+            if ($polygon[$i][1] == $polygon[$j][1]) {
+                continue;
+            }
+    
+            if ($lat < min($polygon[$i][1], $polygon[$j][1])) {
+                continue;
+            }
+    
+            if ($lat >= max($polygon[$i][1], $polygon[$j][1])) {
+                continue;
+            }
+    
+            $x = ($lat - $polygon[$i][1]) * ($polygon[$j][0] - $polygon[$i][0]) / ($polygon[$j][1] - $polygon[$i][1]) + $polygon[$i][0];
+    
+            if ($x > $lon) {
+                $intersections++;
+            }
+        }
+    
+        return ($intersections % 2) == 1;
+    }
+    
+
+    public function isWithinBounds_0($x, $y, $polygon)
     {
         $bounds = [
             "lat_min" => $polygon[0][1],
