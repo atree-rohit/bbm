@@ -88,7 +88,7 @@ import * as d3Legend from "d3-svg-legend"
 import * as d3 from "d3"
 import regions from '../geojson/regions.json'
 import states from '../geojson/states.json'
-import districts from '../geojson/districts.json'
+import districts from '../geojson/districts_2023.json'
 import { mapState } from 'vuex'
 import store from '../store/'
 export default {
@@ -113,9 +113,9 @@ export default {
 			tooltip:null,
             regions: {
 				"east":["Arunachal Pradesh","Assam","Manipur","Meghalaya","Mizoram","Nagaland","Sikkim","Tripura","Bihar","Odisha","Jharkhand","West Bengal"],
-				"north":["Chandigarh","Punjab","Uttarakhand","Ladakh","Jammu & Kashmir","NCT of Delhi","Haryana","Himachal Pradesh","Uttar Pradesh"],
+				"north":["Chandigarh","Punjab","Uttarakhand","Ladakh","Jammu & Kashmir","Delhi","Haryana","Himachal Pradesh","Uttar Pradesh"],
 				"south":["Karnataka","Telangana","Kerala","Andaman & Nicobar","Lakshadweep","Tamil Nadu","Andhra Pradesh","Puducherry"],
-				"west":["Rajasthan","Madhya Pradesh","Gujarat","Dadra and Nagar Haveli and Daman and Diu","Chhattisgarh","Goa","Maharashtra"]
+				"west":["Rajasthan","Madhya Pradesh","Gujarat","Dadra,Nagar Haveli,Daman & Diu","Chhattisgarh","Goa","Maharashtra"]
 			},
 			area_names: {
 				region: [],
@@ -132,6 +132,7 @@ export default {
 		this.init_tooltip()
 		this.init_area_names()
 		this.init()
+		console.clear()
 	},
 	computed:{
 		...mapState({
@@ -162,6 +163,7 @@ export default {
 			let mode = this.mapModes[this.mapMode].toLowerCase()
             let op
 			if(this.mapMode < 3){
+				console.log(this.areaStats[mode], polygon[mode])
 				op = this.colors(this.areaStats[mode][polygon[mode]].observations)
 			} else {
 				op = 'hsl(200,100%, 80%)'
@@ -207,20 +209,21 @@ export default {
 					this.areaStats.state[props.state] = {observations:0, users:new Set(), species: new Set()}
 				}
 				if(this.areaStats.district[props.district] == undefined){
-					this.areaStats.district[props.district.trim()] = {observations:0, users:new Set(), species: new Set()}
+					this.areaStats.district[props.district] = {observations:0, users:new Set(), species: new Set()}
 				}
 			})
-			d3.groups(this.filtered_observations, o => o.state.trim(), o => o.district.trim()).map((state) => {
-				let region
+			let data = this.filtered_observations.filter((d) => d.district != null)
+			d3.groups(data, o => o.state, o => o.district).map((state) => {
+				let region = ""
 				Object.keys(this.regions).forEach((r) => {
 					if(this.regions[r].indexOf(state[0]) != -1){
 						region = r
 					}
 				})
 				state[1].map((district) => {
-                    // console.log(region, state[0], `-${district[0].trim()}-`, this.areaStats)
-                    console.log(district, district[1].length)
-					// this.areaStats.district[district[0].trim()].observations = district[1].reduce((a, b) => a + b.count, 0)
+					if(this.areaStats.state[state[0]] == undefined){
+						console.log(2, state)
+					}
 					this.areaStats.district[district[0]].observations = district[1].length
 					this.areaStats.district[district[0]].users = new Set(district[1].map((o) => o.user_id))
 					this.areaStats.district[district[0]].species = new Set(district[1].map((o) => o.taxa_id))
