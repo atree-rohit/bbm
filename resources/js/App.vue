@@ -76,23 +76,6 @@ export default defineComponent({
     created(){
         store.dispatch('getAllData')
         this.set_page()
-
-        const capitalizeWords = (str) =>  str.replace(/\b\w/g, (match) => match.toUpperCase())
-
-        let op = {
-            "type": "FeatureCollection",
-            "features": []
-        }
-        console.clear()
-        d.features.forEach((feature) => {
-            feature.properties = {
-                state: capitalizeWords(feature.properties.stname.toLowerCase()),
-                district: feature.properties.dtname,
-            }
-            op.features.push(feature)
-        })
-        console.log(op)
-
     },
     computed:{
         ...mapState([
