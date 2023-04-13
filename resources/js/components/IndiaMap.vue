@@ -70,7 +70,7 @@
 </style>
 
 <template>
-	<div>
+	<div ref="mapDiv">
         <div id="controls">
             <h3>{{mapModes[mapMode]}} - {{selected_area}}</h3>
 			<input
@@ -199,7 +199,7 @@ export default {
 			this.path = null
 			this.svg = {}
 			this.height = window.innerHeight * 0.6
-			this.width = window.innerWidth * 0.95
+			this.width = this.$refs.mapDiv.clientWidth * 0.95
 			if(window.innerWidth < 800){
 				this.projection = d3.geoMercator().scale(600).center([110, 20])
 			} else {

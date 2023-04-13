@@ -22,7 +22,8 @@ export default createStore({
                 day: [],
             },
             users: [],
-        }
+        },
+        selected_taxa_descendants: [],
     },
     mutations:{
         SET_TAXA(state, payload){
@@ -44,6 +45,17 @@ export default createStore({
             } else {
                 state.selected.taxa.push(taxon)
             }
+        },
+        SET_SELECTED_TAXA_DESCENDANTS(state){
+            const selectedDescendantTaxa = []
+            state.selected.taxa.forEach(taxaId => {
+                selectedDescendantTaxa.push(taxaId)
+                const descendants = state.taxa
+                    .filter(taxa => (taxa.ancestry === null) ? false : taxa.ancestry.includes(taxaId))
+                    .map(taxa => taxa.id)
+                selectedDescendantTaxa.push(...descendants)
+            })
+            state.selected_taxa_descendants = selectedDescendantTaxa.filter((t) => !state.selected.taxa.includes(t))
         },
         SET_SELECTED_PORTAL(state, portal){
             const index = state.selected.portals.indexOf(portal)
@@ -102,7 +114,10 @@ export default createStore({
                 })
             }
             if(state.selected.taxa.length > 0){
-                state.filtered_observations = state.filtered_observations.filter(observation => state.selected.taxa.includes(observation.taxa_id))
+                state.filtered_observations = state.filtered_observations.filter(observation => {
+                    const taxaId = observation.taxa_id
+                    return ( state.selected.taxa.includes(taxaId) || state.selected_taxa_descendants.includes(taxaId) )
+                })
             }
             if(state.selected.location.state.length > 0){
                 state.filtered_observations = state.filtered_observations.filter(observation => state.selected.location.state.includes(observation.state))
@@ -150,6 +165,7 @@ export default createStore({
         },
         selectTaxa({commit}, payload){
             commit('SET_SELECTED_TAXA', payload)
+            commit('SET_SELECTED_TAXA_DESCENDANTS', payload)
             commit('SET_FILTERED_OBSERVATIONS')
         },
         selectState({commit}, payload){

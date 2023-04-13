@@ -91,7 +91,9 @@
     @media screen and (min-width: 800px) {
         .data-wrapper.selected-filter, 
         .data-wrapper.selected-mode{
-            grid-template-rows: 7.5rem auto;
+            /* grid-template-rows: 7.5rem auto; */
+            /* grid-template-rows: auto auto; */
+            grid-template-columns: 25% auto;
         }
     }
 </style>

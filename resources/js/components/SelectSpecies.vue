@@ -14,12 +14,29 @@
         grid-gap: 0rem;
     }
 
+    .chip.selected-descendant > div:first-child{
+        background:darkgoldenrod;
+    }
+
+    .chip.selected-descendant > div:nth-child(2){
+        color:darkgoldenrod;
+    }
+
+    .chip.unselected > div:first-child{
+        /* background:darkgray; */
+        opacity: .5;
+    }
+
+    .chip.unselected > div:nth-child(2){
+        /* color:darkgray; */
+    }
+
     @media screen and (min-width: 800px) {
         .species-select-wrapper{
             border-radius: var(--border-radius);
             padding: .5rem;
-            grid-template-columns: 1fr 3fr;
-            grid-template-rows: auto;
+            grid-template-columns: auto;
+            grid-template-rows: 1fr 3fr;
             justify-content: space-between;
         }
     }
@@ -49,7 +66,7 @@
                 class="chip"
                 v-for="taxon in filtered_taxa"
                 :key="taxon.id"
-                :class="{ selected: selected.taxa.indexOf(taxon.id) > -1 }"
+                :class="chipClass(taxon.id)"
                 @click="selectTaxa(taxon)"
                 :title="taxon.rank"
             >
@@ -76,7 +93,8 @@ export default defineComponent({
     computed: {
         ...mapState([
             "taxa",
-            "selected"
+            "selected",
+            "selected_taxa_descendants"
         ]),
         cleaned_taxa(){
             return this.taxa.filter(taxon => {
@@ -113,6 +131,18 @@ export default defineComponent({
         selectTaxa(taxon){
             store.dispatch("selectTaxa", taxon.id)
         },
+        chipClass(taxaId){
+            let op = ""
+            if(this.selected.taxa.length == 0) return op
+            if(this.selected.taxa.indexOf(taxaId) > -1){
+                op = "selected"
+            } else if(this.selected_taxa_descendants.indexOf(taxaId) > -1){
+                op = "selected-descendant"
+            } else {
+                op = "unselected"
+            }
+            return op
+        }
     }    
 })
 </script>
