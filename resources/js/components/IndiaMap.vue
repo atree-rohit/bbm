@@ -1,7 +1,11 @@
 <style>
     #controls{
-        margin: 0 2rem;
+		text-align: center;
+        margin: 0;
     }
+	.form-range{
+		width: 100%;
+	}
 	.map-boundary path{
 		/* stroke: transparent; */
 		stroke-linejoin: round;
@@ -69,15 +73,13 @@
 	<div>
         <div id="controls">
             <h3>{{mapModes[mapMode]}} - {{selected_area}}</h3>
-			<div class="row">
-				<input
-					type="range"
-					class="form-range"
-					min="0"
-					max="2"
-					v-model="mapMode"
-				>
-			</div>
+			<input
+				type="range"
+				class="form-range"
+				min="0"
+				max="2"
+				v-model="mapMode"
+			>
         </div>
 		<div id="map-container"></div>
 	</div>
@@ -95,7 +97,7 @@ export default {
 	name:"IndiaMap",
 	data() {
 		return{
-            mapMode: 0,
+            mapMode: 2,
             mapModes: ["Region", "State", "District"],
 			mapLayers: [regions, states, districts],
 			polygons: null,
@@ -126,19 +128,20 @@ export default {
 			hexagons: {},
 			locations: [],
 			areaStats: {},
+			zoomTransform: null,
 		}
 	},
 	mounted(){
 		this.init_tooltip()
 		this.init_area_names()
 		this.init()
-		console.clear()
+		// console.clear()
 	},
 	computed:{
-		...mapState({
-			selected: state => state.selected,
-			filtered_observations: state => state.filtered_observations,
-		}),
+		...mapState([
+			"selected",
+			"filtered_observations"
+		]),
 		zoom() {
 			return d3.zoom()
 				.scaleExtent([.5, 250])
@@ -147,8 +150,17 @@ export default {
 		},
 	},
 	watch: {
-		filtered_observations(){
-			this.init()
+		filtered_observations(newVal, oldVal){
+			if(oldVal.length == 0){
+				this.init()
+			}
+		},
+		selected: {
+			handler(newValue, oldValue) {
+				console.log("selected changed", newValue, oldValue)
+				this.renderMap()
+			},
+			deep: true,
 		},
 		mapMode(){
 			this.selected_area = "All"
@@ -163,7 +175,6 @@ export default {
 			let mode = this.mapModes[this.mapMode].toLowerCase()
             let op
 			if(this.mapMode < 3){
-				console.log(this.areaStats[mode], polygon[mode])
 				op = this.colors(this.areaStats[mode][polygon[mode]].observations)
 			} else {
 				op = 'hsl(200,100%, 80%)'
@@ -172,6 +183,7 @@ export default {
             return op
         },
         handleZoom(e){
+			this.zoomTransform = e.transform
 			let text_size = (1/e.transform.k)
             this.svg.selectAll('.poly_text')
                 .attr('transform', e.transform)
@@ -186,16 +198,14 @@ export default {
 			this.polygons = null
 			this.path = null
 			this.svg = {}
-			this.height = window.innerHeight * 0.75
+			this.height = window.innerHeight * 0.6
 			this.width = window.innerWidth * 0.95
 			if(window.innerWidth < 800){
-				this.projection = d3.geoMercator().scale(700).center([106.75, 27.5])
+				this.projection = d3.geoMercator().scale(600).center([110, 20])
 			} else {
-				this.projection = d3.geoMercator().scale(1000).center([65, 27.5])
+				this.projection = d3.geoMercator().scale(800).center([65, 23])
 			}
 			this.path = d3.geoPath().projection(this.projection)
-			this.init_area_stats()
-			this.init_legend()
 			this.renderMap()
 		},
 		init_area_stats(){
@@ -323,6 +333,9 @@ export default {
 								.cells(6)
 		},			
 		renderMap () {
+			this.init_area_stats()
+			this.init_legend()
+			
 			if (!d3.select("#map-container svg.svg-content").empty()) {
 				d3.select("#map-container svg.svg-content").remove()
 			}
@@ -331,12 +344,14 @@ export default {
 							.attr("preserveAspectRatio", "xMinYMin meet")
 							.attr("width", this.width)
 							.attr("height", this.height)
-							// .style("background-color", "rgb(190, 229, 235)")
-							.classed("svg-content d-flex m-auto", true)
+							.classed("svg-content", true)
+			if(!this.zoomTransform){
+				this.zoomTransform =  d3.zoomTransform(this.svg.node())
+			}
+
 			if(this.height > this.width){
 				this.legend.shapeWidth(35)
 				.cells(4)
-				// .shapePadding(37)
 			}
 			let base = this.svg.append("g")
 				.classed("map-boundary", true)
@@ -346,22 +361,25 @@ export default {
 				.selectAll("text").append("g")
 			this.polygons = base.append("g")
 				.classed("polygons", true)
+			
 			if(this.mapMode == 1 && this.selected_area != "All"){
 				console.log("now")
 			}
 			this.mapLayers[this.mapMode].features.forEach((polygon) => {
 				this.drawPolygon(polygon)
 			})
+
 			if(this.mapMode < 2){
 				this.mapLayers[this.mapMode].features.forEach((polygon) => {
 					this.drawPolygonLabel(base_text, polygon)
 				})					
 			}
-			
 			this.svg.append("g")
 				.attr("transform", "translate("+this.width*.5+", 50)")
 				.call(this.legend)
 			this.svg.call(this.zoom)
+
+			this.svg.call(this.zoom.transform, this.zoomTransform)
 		},
 		drawPolygon(polygon){
 			this.polygons.append("g")
